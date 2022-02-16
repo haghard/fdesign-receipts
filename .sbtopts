@@ -1,0 +1,7 @@
+-J-Xms250M
+-J-Xmx350M
+#-J-XX:MaxNewSize=550M
+-J-Xss4M
+-J-XX:+UseG1GC
+#-J-XX:+PrintCommandLineFlags
+#-J-XshowSettings:vm
