@@ -1,5 +1,7 @@
 
+
 https://github.com/jdegoes/functional-design
+
 https://medium.com/bigdatarepublic/writing-functional-dsls-for-business-domains-1bccc5d3f62b
 
 
@@ -32,8 +34,3 @@ There are many ways to factor a DSL, but some are better than others. These guid
  * Composable, to permit a lot of power in a small, reasonable package
  * Expressive, to solve the full range of problems in the domain
  * Orthogonal, such that no primitive provides the capabilities of any other
-
-
-
-
-Though few developers using monads actually understand this, monads represent an embedding of imperative programming into purely functional programming.

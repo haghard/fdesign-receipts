@@ -14,10 +14,10 @@ import zio.duration._
  * even the most complex problems easily, with high testability and
  * reasonability.
  *
- * Functional Design embraces the composability, immutability, and static
+ * Functional Design embraces the compatibility, immutability, and static
  * type safety afforded by functional programming, and applies it to solve
  * real world problems, close to business domains, all without the esoteric
- * type classes, category theory jargon, confusing and undiscoverable implicits,
+ * type classes, category theory jargon, confusing and undiscovered implicits,
  * monad transformers, and other constructs common in the early days of
  * functional Scala.
  *
