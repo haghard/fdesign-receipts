@@ -101,9 +101,9 @@ object MotivationExecutable2 {
 
     //if you're using declaration side covariance `final case class CalculatedValue[+A]` the "+"" sign
     //you going to have type bounds `def +[B >: A]` on all the methods that accept that as input.
-    def +[B >: A](that: CalculatedValue[B])(implicit N: Numeric[B]): CalculatedValue[B] =
+    def +[B >: A](that: CalculatedValue[B])(implicit scalaNum: Numeric[B]): CalculatedValue[B] =
       CalculatedValue[B] { ss =>
-        N.plus(self.eval(ss), that.eval(ss))
+        scalaNum.plus(self.eval(ss), that.eval(ss))
       }
 
     def -[B >: A](that: CalculatedValue[B])(implicit N: Numeric[B]): CalculatedValue[B] =
