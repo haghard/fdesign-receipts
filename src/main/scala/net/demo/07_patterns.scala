@@ -537,9 +537,9 @@ object recipes {
 
   sealed trait Baked[+A]
   object Baked {
-    final case class Burnt[A](value: A)                                    extends Baked[A]
-    final case class CookedPerfect[A](value: A)                            extends Baked[A]
-    final case class Undercooked[A](value: A)                              extends Baked[A]
+    final case class Burnt[A](value: A)                                     extends Baked[A]
+    final case class CookedPerfect[A](value: A)                             extends Baked[A]
+    final case class Undercooked[A](value: A)                               extends Baked[A]
     final case class FlatMap[A, B](recipe: Recipe[A], next: A => Recipe[B]) extends Baked[B]
   }
 
@@ -592,12 +592,12 @@ object recipes {
   }
 
   object Recipe {
-    case object Disaster                                               extends Recipe[Nothing]
-    final case class Succeed[A](value: A)                              extends Recipe[A]
-    final case class AddIngredient(ingredient: Ingredient)             extends Recipe[Ingredient]
-    final case class Bake[A](recipe: Recipe[A], temp: Int, time: Int)  extends Recipe[Baked[A]]
+    case object Disaster                                                extends Recipe[Nothing]
+    final case class Succeed[A](value: A)                               extends Recipe[A]
+    final case class AddIngredient(ingredient: Ingredient)              extends Recipe[Ingredient]
+    final case class Bake[A](recipe: Recipe[A], temp: Int, time: Int)   extends Recipe[Baked[A]]
     final case class FlatMap[A, B](value: Recipe[A], f: A => Recipe[B]) extends Recipe[B]
-    final case class TryOrElse[A](left: Recipe[A], right: Recipe[A])   extends Recipe[A]
+    final case class TryOrElse[A](left: Recipe[A], right: Recipe[A])    extends Recipe[A]
 
     def addIngredient(ingredient: Ingredient): Recipe[Ingredient] = AddIngredient(ingredient)
 

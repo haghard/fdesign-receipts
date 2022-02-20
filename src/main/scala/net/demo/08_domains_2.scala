@@ -656,18 +656,18 @@ object data_processing {
   }
 
   object Schema {
-    case object Arbitrary                                             extends Schema
-    case object Null                                                  extends Schema
-    case object Bool                                                  extends Schema
-    case object Number                                                extends Schema
-    case object Str                                                   extends Schema
-    case object Date                                                  extends Schema
-    case object DateTime                                              extends Schema
-    final case class Described(description: String, schema: Schema)   extends Schema
-    final case class HasField(name: String, value: () => Schema)       extends Schema
+    case object Arbitrary                                               extends Schema
+    case object Null                                                    extends Schema
+    case object Bool                                                    extends Schema
+    case object Number                                                  extends Schema
+    case object Str                                                     extends Schema
+    case object Date                                                    extends Schema
+    case object DateTime                                                extends Schema
+    final case class Described(description: String, schema: Schema)     extends Schema
+    final case class HasField(name: String, value: () => Schema)        extends Schema
     final case class Intersect(left: () => Schema, right: () => Schema) extends Schema
     final case class Union(left: () => Schema, right: () => Schema)     extends Schema
-    final case class Sequence(elementSchema: () => Schema)             extends Schema
+    final case class Sequence(elementSchema: () => Schema)              extends Schema
 
     def hasField(name: String, value: => Schema): Schema = HasField(name, () => value)
 

@@ -3,215 +3,141 @@ package net.demo
 import scala.util.Try
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
-import net.demo.GADTs.Num.Dbl
-import net.demo.GADTs.Num.Flt
-import net.demo.GADTs.Num.Lng
 
-/** GADTs - Parametricaly polimorpic ADT, where you are allowed to specialize a type parameter in the terms of the sum type.
+/** GADTs - Parametrically polymorphic ADT, where you are allowed to specialize a type parameter in the terms of the sum type.
   *
-  * Specializion the type T of Num inside the childer together with being able to reconsctuct this information in pattern matching is known as GADTs.
+  * Specialization the type T of Num inside the children together with being able to reconstruct this information in pattern matching is known as GADTs.
   *
   * //(Scalac knows about types in each cases)
-  * def zero[T](N: Num[T]): T =
-  * N match {
-  * case Num.Integer ⇒ 1    //T =:= Int
-  * case Num.Dbl     ⇒ 1.0  //T =:= Double
-  * case Num.Lng     ⇒ 1L   //T =:= Long
-  * case Num.Flt     ⇒ 1.7f //T =:= Float
-  * }
-  *
-  * runMain net.demo.GADTs
+  * def zero[T](N: NumTag[T]): T =
+  *   N match {
+  *     case NumTag.Integer ⇒ 1    //T =:= Int
+  *     case NumTag.Dbl     ⇒ 1.0  //T =:= Double
+  *     case NumTag.Lng     ⇒ 1L   //T =:= Long
+  *     case NumTag.Flt     ⇒ 1.7f //T =:= Float
+  *   }
   */
-object GADTs extends App {
 
-  sealed trait SerializableVal[T]
+/*
 
-  object SerializableVal {
-    implicit case object Integer extends SerializableVal[Int]
+Functional Scala - Next-Level Type Safety: An Intro to Generalized Algebraic Data Types https://youtu.be/1E053kld8Ac?t=331
+sealed trait TypeEquality[A, B] {
+  def toF[F[_]](a: F[A]): F[B]
 
-    implicit case object Dbl extends SerializableVal[Double]
+  def fromF[F[_]](a: F[B]): F[A]
+}
 
-    implicit case object Flt extends SerializableVal[Float]
+object TypeEquality {
+  implicit def refl[A]: TypeEquality[A, A] = new TypeEquality[A, A] {
+    def toF[F[_]](a: F[A]): F[A] = a
 
-    implicit case object Lng extends SerializableVal[Long]
+    def fromF[F[_]](a: F[A]): F[A] = a
   }
+}
+ */
+
+//runMain net.demo.GADTs
+object GADTs extends App {
 
   //Declarative encoding
   //We turn our dynamically typed model of CalculatedValue into a statically typed DSL
   //we can't use scala.math.Numeric because it's not a sum nor a product type.
-  //As we use decrarative encoding we want to have as many interpreters as we'd like.
-  sealed trait Num[T]
+  //As we use declarative encoding we want to have as many interpreters as we'd like.
 
-  object Num {
-    implicit case object Integer extends Num[Int]
+  sealed trait NumTag[T]
 
-    implicit case object Dbl extends Num[Double]
+  object NumTag {
+    implicit case object Integer extends NumTag[Int]
 
-    implicit case object Flt extends Num[Float]
+    implicit case object Dbl extends NumTag[Double]
 
-    implicit case object Lng extends Num[Long]
+    implicit case object Flt extends NumTag[Float]
+
+    implicit case object Lng extends NumTag[Long]
   }
 
-  sealed abstract case class Cast[-In, +Out](op: In => Try[Out])
+  sealed abstract case class Coercion[-In, +Out](op: In => Try[Out])
 
-  //A set of casts this DSL supports
-  object Cast {
-    implicit object A extends Cast[Int, Double]((in: Int) => Try(in.toDouble))
-
-    implicit object B extends Cast[String, Double]((in: String) => Try(in.toDouble))
-
-    implicit object C extends Cast[Double, Int]((in: Double) => Try(in.toInt))
-  }
-
-  import Cast._
-
-  /*
-  sealed trait Coercion[In, Out] {
-    def from: Num[In]
-
-    def to: Num[Out]
-
-    def toSer: SerializableVal[Out]
-  }
-
+  //A set of coercions this DSL supports
   object Coercion {
+    implicit object A extends Coercion[Int, Double]((in: Int) => Try(in.toDouble))
 
-    implicit object IntToDouble extends Coercion[Int, Double] {
-      def from = Num.Integer
+    implicit object B extends Coercion[String, Double]((in: String) => Try(in.toDouble))
 
-      def to = Num.Dbl
-
-      def toSer = SerializableVal.Dbl
-    }
-
-    implicit object DoubleToInt extends Coercion[Double, Int] {
-      def from = Num.Dbl
-
-      def to = Num.Integer
-
-      def toSer = SerializableVal.Integer
-    }
-
-    implicit object LongToInt extends Coercion[Long, Int] {
-      def from = Num.Lng
-
-      def to = Num.Integer
-
-      def toSer = SerializableVal.Integer
-    }
-  }*/
-
-  //Functional Scala - Next-Level Type Safety: An Intro to Generalized Algebraic Data Types https://youtu.be/1E053kld8Ac?t=331
-  /*
-  sealed trait TypeEquality[A, B] {
-    def toF[F[_]](a: F[A]): F[B]
-
-    def fromF[F[_]](a: F[B]): F[A]
+    implicit object C extends Coercion[Double, Int]((in: Double) => Try(in.toInt))
   }
 
-  object TypeEquality {
-    implicit def refl[A]: TypeEquality[A, A] = new TypeEquality[A, A] {
-      def toF[F[_]](a: F[A]): F[A] = a
-
-      def fromF[F[_]](a: F[A]): F[A] = a
-    }
-  }
-   */
-
-  sealed trait CalculatedValue[+A] {
+  sealed trait DslElement[+A] {
     self =>
 
-    def +[B >: A](that: CalculatedValue[B])(implicit N: Num[B]): CalculatedValue[B] =
-      CalculatedValue.Plus(self, that, N)
+    def +[B >: A](that: DslElement[B])(implicit tag: NumTag[B]): DslElement[B] =
+      DslElement.Plus(self, that, tag)
 
-    def -[B >: A](that: CalculatedValue[B])(implicit N: Num[B]): CalculatedValue[B] =
-      CalculatedValue.Minus(self, that, N)
+    def -[B >: A](that: DslElement[B])(implicit tag: NumTag[B]): DslElement[B] =
+      DslElement.Minus(self, that, tag)
 
-    def *[B >: A](that: CalculatedValue[B])(implicit N: Num[B]): CalculatedValue[B] =
-      CalculatedValue.Times(self, that, N)
+    def *[B >: A](that: DslElement[B])(implicit tag: NumTag[B]): DslElement[B] =
+      DslElement.Times(self, that, tag)
 
-    def as[B](implicit cast: Cast[A, B], to: Num[B]): CalculatedValue[B] =
-      CalculatedValue.CastTo(self, cast, to)
+    def as[B](implicit c: Coercion[A, B], destTag: NumTag[B]): DslElement[B] =
+      DslElement.CastTo(self, c, destTag)
 
-    def unary_-[B >: A](implicit N: Num[B]): CalculatedValue[B] =
-      CalculatedValue.Negate(self, N)
+    def unary_-[B >: A](implicit N: NumTag[B]): DslElement[B] =
+      DslElement.Negate(self, N)
 
-    /*
-    def +(that: CalculatedValue[A])(implicit N: Num[A]): CalculatedValue[A] =
-      CalculatedValue.Plus(self, that, N)
+    def d(implicit c: Coercion[A, Double], destTag: NumTag[Double]): DslElement[Double] =
+      DslElement.CastTo(self, c, destTag)
 
-    def -(that: CalculatedValue[A])(implicit N: Num[A]): CalculatedValue[A] =
-      CalculatedValue.Minus(self, that, N)
-
-    def *(that: CalculatedValue[A])(implicit N: Num[A]): CalculatedValue[A] =
-      CalculatedValue.Times(self, that, N)
-
-    def as[B](implicit coercion: Coercion[A, B], N: Num[B]): CalculatedValue[B] =
-      CalculatedValue.Coercible(self, coercion)
-
-    def unary_-(implicit N: Num[A]): CalculatedValue[A] =
-      CalculatedValue.Negate(self, N)*/
+    def l(implicit c: Coercion[A, Long], destTag: NumTag[Long]): DslElement[Long] =
+      DslElement.CastTo(self, c, destTag)
   }
 
-  object CalculatedValue {
+  object DslElement {
 
-    final case class Plus[A](a: CalculatedValue[A], b: CalculatedValue[A], N: Num[A]) extends CalculatedValue[A]
+    final case class Plus[A](a: DslElement[A], b: DslElement[A], tag: NumTag[A]) extends DslElement[A]
 
-    final case class Minus[A](a: CalculatedValue[A], b: CalculatedValue[A], N: Num[A]) extends CalculatedValue[A]
+    final case class Minus[A](a: DslElement[A], b: DslElement[A], tag: NumTag[A]) extends DslElement[A]
 
-    final case class Times[A](a: CalculatedValue[A], b: CalculatedValue[A], N: Num[A]) extends CalculatedValue[A]
+    final case class Times[A](a: DslElement[A], b: DslElement[A], tag: NumTag[A]) extends DslElement[A]
 
-    final case class Negate[A](v: CalculatedValue[A], N: Num[A]) extends CalculatedValue[A]
+    final case class Negate[A](v: DslElement[A], tag: NumTag[A]) extends DslElement[A]
 
-    final case class Literal[A](v: A, sv: SerializableVal[A]) extends CalculatedValue[A]
+    final case class Literal[A](v: A, tag: NumTag[A]) extends DslElement[A]
 
-    final case class CastTo[A, B](v: CalculatedValue[A], cast: Cast[A, B], N: Num[B]) extends CalculatedValue[B]
-    //final case class Coerce[A, B](v: CalculatedValue[A], c: Coercion[A, B])            extends CalculatedValue[B]
+    final case class CastTo[A, B](v: DslElement[A], cast: Coercion[A, B], tag: NumTag[B]) extends DslElement[B]
 
-    /*
-    final case class IntLiteral[A](v: CalculatedValue[A], aIsInt: TypeEquality[A, Int])    extends CalculatedValue[A]
-    final case class DblLiteral[A](v: CalculatedValue[A], aIsInt: TypeEquality[A, Double]) extends CalculatedValue[A]
-    final case class FltLiteral[A](v: CalculatedValue[A], aIsInt: TypeEquality[A, Float])  extends CalculatedValue[A]
-    final case class LongLiteral[A](v: CalculatedValue[A], aIsInt: TypeEquality[A, Long])  extends CalculatedValue[A]
-     */
+    def lit[A](c: A)(implicit tag: NumTag[A]): DslElement[A] = Literal(c, tag)
 
-    def lit[A](c: A)(implicit ev: Num[A], cst: SerializableVal[A]): CalculatedValue[A] =
-      Literal(c, cst)
-
-    implicit class CalculatedValueOps[A](val self: A) extends AnyVal {
-      def lit(implicit ev: Num[A], sv: SerializableVal[A]): CalculatedValue[A] =
-        Literal(self, sv)
+    implicit class DslElementOps[A](val self: A) extends AnyVal {
+      def lit(implicit tag: NumTag[A]): DslElement[A] = Literal(self, tag)
     }
 
     implicit class CalculatedValueStrOps(val self: String) extends AnyVal {
-      def fromStr[A](implicit
-        ev: Num[A],
-        sv: SerializableVal[A]
-      ): CalculatedValue[A] =
+      def fromStr[A](implicit ev: NumTag[A], sv: NumTag[A]): DslElement[A] =
         ev match {
-          case Num.Integer => Try(self.toInt).map(Literal(_, sv)).getOrElse(throw new Exception("toInt !!!"))
-          case Num.Dbl     => Try(self.toDouble).map(Literal(_, sv)).getOrElse(throw new Exception("toDouble !!!"))
-          case Num.Flt     => Try(self.toFloat).map(Literal(_, sv)).getOrElse(throw new Exception("toFloat !!!"))
-          case Num.Lng     => Try(self.toLong).map(Literal(_, sv)).getOrElse(throw new Exception("toLong !!!"))
+          case NumTag.Integer => Try(self.toInt).map(Literal(_, sv)).getOrElse(throw new Exception("Error toInt !"))
+          case NumTag.Dbl     => Try(self.toDouble).map(Literal(_, sv)).getOrElse(throw new Exception("Error toDouble !"))
+          case NumTag.Flt     => Try(self.toFloat).map(Literal(_, sv)).getOrElse(throw new Exception("Error  toFloat !"))
+          case NumTag.Lng     => Try(self.toLong).map(Literal(_, sv)).getOrElse(throw new Exception("Error toLong !"))
         }
-      //CalculatedValue.Literal(ev.fromStr(self)(_.toInt, _.toDouble, _.toFloat, _.toLong), sv)
     }
   }
 
-  import Num._
-  import CalculatedValue._
+  import NumTag._
+  import DslElement._
 
   //default interpreter
-  def eval[T](v: CalculatedValue[T]): T = {
-    def plus[T](a: T, b: T, n: Num[T]): T =
-      n match {
+  def eval[T](v: DslElement[T]): T = {
+
+    def plus(a: T, b: T, ev: NumTag[T]): T =
+      ev match {
         case Integer => a + b
         case Dbl     => a + b
         case Flt     => a + b
         case Lng     => a + b
       }
 
-    def minus[T](a: T, b: T, n: Num[T]): T =
+    def minus(a: T, b: T, n: NumTag[T]): T =
       n match {
         case Integer => a - b
         case Dbl     => a - b
@@ -219,7 +145,7 @@ object GADTs extends App {
         case Lng     => a - b
       }
 
-    def times[T](a: T, b: T, n: Num[T]): T =
+    def times(a: T, b: T, n: NumTag[T]): T =
       n match {
         case Integer => a * b
         case Dbl     => a * b
@@ -227,7 +153,7 @@ object GADTs extends App {
         case Lng     => a * b
       }
 
-    def negate[T](a: T, n: Num[T]): T =
+    def negate(a: T, n: NumTag[T]): T =
       n match {
         case Integer => -a
         case Dbl     => -a
@@ -235,52 +161,36 @@ object GADTs extends App {
         case Lng     => -a
       }
 
-    /*def converter[A, B](from: Num[A], to: Num[B]): A => B =
-      (from, to) match {
-        case (Integer, Dbl) => in: Int => in.toDouble
-        case (Integer, Lng) => in: Int => in.toLong
-        case (Integer, Flt) => in: Int => in.toFloat
-
-        case (Dbl, Integer) => in: Double => in.toInt
-        case (Dbl, Lng)     => in: Double => in.toLong
-        case (Dbl, Flt)     => in: Double => in.toFloat
-
-        case (Flt, Integer) => in: Float => in.toInt
-        case (Flt, Dbl)     => in: Float => in.toDouble
-        case (Flt, Lng)     => in: Float => in.toLong
-
-        case (Lng, Integer) => in: Long => in.toInt
-        case (Lng, Dbl)     => in: Long => in.toDouble
-        case (Lng, Flt)     => in: Long => in.toFloat
-
-        case _ => ???
-      }*/
-
     v match {
       /*
-        [error]  found   : net.demo.GADTs.Num[?T2] where type ?T2 <: T (this is a GADT skolem)
+        found   : net.demo.GADTs.Num[?T1] where type ?T1 <: T (this is a GADT skolem)
         [error]  required: net.demo.GADTs.Num[T]
-        case Plus(a, b, n) ⇒ plus(eval(a), eval(b), n)
+        [error] Note: ?T1 <: T, but trait Num is invariant in type T.
+        [error] You may wish to define T as +T instead. (SLS 4.5)
+        [error]         plus(eval(a), eval(b), n)
+      case Plus(a, b, n) => plus(eval(a), eval(b), n)
        */
       case op: Plus[T] =>
-        plus(eval(op.a), eval(op.b), op.N)
+        plus(eval(op.a), eval(op.b), op.tag)
       case op: Minus[T] =>
-        minus(eval(op.a), eval(op.b), op.N)
+        minus(eval(op.a), eval(op.b), op.tag)
       case op: Times[T] =>
-        times(eval(op.a), eval(op.b), op.N)
+        times(eval(op.a), eval(op.b), op.tag)
       case op: Negate[T] =>
-        negate(eval(op.v), op.N)
-      case Literal(v, _) => v
+        negate(eval(op.v), op.tag)
       case castOp: CastTo[in, out] =>
         val rawValue = eval(castOp.v)
         castOp.cast.op(rawValue) match {
           case Success(v) => v
           case Failure(ex) =>
             throw new IllegalArgumentException(
-              s"Cast error: ${rawValue.getClass.getName} -> ${castOp.N.getClass.getName}",
+              s"Cast error: ${rawValue.getClass.getName} -> ${castOp.tag.getClass.getName}",
               ex
             )
         }
+      case Literal(v, _) =>
+        v
+
       /*case coerce: Coerce[in, out] =>
         val rawValue = eval(coerce.v) //.asInstanceOf[coerce.c.In]
         converter(coerce.c.from, coerce.c.to)(rawValue)*/
@@ -292,25 +202,25 @@ object GADTs extends App {
   val f: Byte = 0x02
   val l: Byte = 0x03
 
-  def serialize[T](v: CalculatedValue[T]): String =
+  def serialize[T](v: DslElement[T]): String =
     v match {
-      case Plus(a, b, n)  => s"PLUS|" + serialize(a) + "|" + serialize(b)
-      case Minus(a, b, n) => s"MINUS|" + serialize(a) + "|" + serialize(b)
-      case Times(a, b, n) => s"TIMES|" + serialize(a) + "|" + serialize(b)
-      case Negate(v, n)   => s"NEGATE|" + serialize(v)
+      case Plus(a, b, _)  => s"PLUS|" + serialize(a) + "|" + serialize(b)
+      case Minus(a, b, _) => s"MINUS|" + serialize(a) + "|" + serialize(b)
+      case Times(a, b, _) => s"TIMES|" + serialize(a) + "|" + serialize(b)
+      case Negate(v, _)   => s"NEGATE|" + serialize(v)
       case Literal(v, c) =>
         c match {
-          case SerializableVal.Integer => s"$i:$v"
-          case SerializableVal.Dbl     => s"$d:$v"
-          case SerializableVal.Flt     => s"$f:$v"
-          case SerializableVal.Lng     => s"$l:$v"
+          case NumTag.Integer => s"$i:$v"
+          case NumTag.Dbl     => s"$d:$v"
+          case NumTag.Flt     => s"$f:$v"
+          case NumTag.Lng     => s"$l:$v"
         }
       case c: CastTo[in, out] =>
-        val to = c.N match {
-          case Num.Integer => i
-          case Num.Dbl     => d
-          case Num.Flt     => f
-          case Num.Lng     => l
+        val to = c.tag match {
+          case NumTag.Integer => i
+          case NumTag.Dbl     => d
+          case NumTag.Flt     => f
+          case NumTag.Lng     => l
         }
         "CAST|" + serialize(c.v) + "->" + to
 
@@ -325,49 +235,50 @@ object GADTs extends App {
        */
     }
 
-  def deserialize(line: String): CalculatedValue[_] = ???
+  def deserialize(line: String): DslElement[_] = ???
 
-  //another open interpteter
-  /*
-  def eval2[T](v: CalculatedValue[T]): T =
+  //another open interpreter
+  def eval2[T](v: DslElement[T]): T =
     v match {
-      case CalculatedValue.Const(v) ⇒ v
-      case CalculatedValue.Plus(a, b, n) ⇒
-        n match {
-          case Numrc.Integer ⇒ (eval(a) + eval(b)) * 2
-          case Numrc.Dbl     ⇒ (eval(a) + eval(b)) * 2
-          case Numrc.Lng     ⇒ (eval(a) + eval(b)) * 2
-          case Numrc.Flt     ⇒ (eval(a) + eval(b)) * 2
+      case op: Plus[T] =>
+        op.tag match {
+          case NumTag.Integer => eval2(op.a) + eval2(op.b)
+          case NumTag.Dbl     => eval2(op.a) + eval2(op.b)
+          case NumTag.Lng     => eval2(op.a) + eval2(op.b)
+          case NumTag.Flt     => eval2(op.a) + eval2(op.b)
         }
-      //n.+(eval(a), eval(b))(n)
-      case CalculatedValue.Minus(a, b, n) ⇒
-        n match {
-          case Numrc.Integer ⇒ (eval(a) - eval(b)) * 2
-          case Numrc.Dbl     ⇒ (eval(a) - eval(b)) * 2
-          case Numrc.Lng     ⇒ (eval(a) - eval(b)) * 2
-          case Numrc.Flt     ⇒ (eval(a) - eval(b)) * 2
+      case op: Minus[T] =>
+        op.tag match {
+          case NumTag.Integer => eval2(op.a) - eval2(op.b)
+          case NumTag.Dbl     => eval2(op.a) - eval2(op.b)
+          case NumTag.Lng     => eval2(op.a) - eval2(op.b)
+          case NumTag.Flt     => eval2(op.a) - eval2(op.b)
         }
-      case Miltiple(a, b, n) ⇒
-        n match {
-          case Numrc.Integer ⇒ (eval(a) * eval(b)) * 2
-          case Numrc.Dbl     ⇒ (eval(a) * eval(b)) * 2
-          case Numrc.Lng     ⇒ (eval(a) * eval(b)) * 2
-          case Numrc.Flt     ⇒ (eval(a) * eval(b)) * 2
+      case op: Times[T] =>
+        op.tag match {
+          case NumTag.Integer => eval2(op.a) * eval2(op.b)
+          case NumTag.Dbl     => eval2(op.a) * eval2(op.b)
+          case NumTag.Lng     => eval2(op.a) * eval2(op.b)
+          case NumTag.Flt     => eval2(op.a) * eval2(op.b)
         }
-      case CalculatedValue.Negate(v, n) ⇒
-        n match {
-          case Numrc.Integer ⇒ -eval(v) * 2
-          case Numrc.Dbl     ⇒ -eval(v) * 2
-          case Numrc.Lng     ⇒ -eval(v) * 2
-          case Numrc.Flt     ⇒ -eval(v) * 2
+      case op: Negate[T] =>
+        op.tag match {
+          case NumTag.Integer => -eval2(v)
+          case NumTag.Dbl     => -eval2(v)
+          case NumTag.Lng     => -eval2(v)
+          case NumTag.Flt     => -eval2(v)
         }
+      case Literal(v, _) => v
     }
-   */
 
   try {
     //Statically typed DSL
-    val a = -(lit(1) + lit(7)) + lit(2)
+
+    //val a = -(lit(1) + lit(7)) + lit(2)
     val b = -((1.0.lit + 7.0.lit) + 10.6.lit).as[Int] * 2.lit
+
+    //1.lit.d + 45.lit  could not find implicit value for parameter tag: net.demo.GADTs.NumTag[AnyVal]
+    //45.lit + 1.lit.d
 
     //TIMES|NEGATE|CAST|PLUS|PLUS|1:1.0|1:7.0|1:10.6->0|0:2
     println(serialize(b))

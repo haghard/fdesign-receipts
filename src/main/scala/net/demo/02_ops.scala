@@ -239,7 +239,9 @@ object contact_processing {
         if (i < columnNames.length && j < columnNames.length)
           schema
             .relocate(i, j)
-            .map(schema => copy(schema = schema, content = content.map(row => row.updated(j, row(i)).updated(i, row(j)))))
+            .map(schema =>
+              copy(schema = schema, content = content.map(row => row.updated(j, row(i)).updated(i, row(j))))
+            )
         else None
       }
 
