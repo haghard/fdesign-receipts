@@ -336,7 +336,7 @@ object documents {
     */
   //type Document
 
-  case class Document(id: DocId, user: UserId, cnt: DocContent)
+  final case class Document(id: DocId, user: UserId, cnt: DocContent)
 
   /** EXERCISE 2
     *
@@ -345,7 +345,7 @@ object documents {
     * some users might have read-only permission on a document.
     */
   //type AccessType
-  case class AccessType(verbs: Set[Verb])
+  final case class AccessType(verbs: Set[Verb])
   sealed trait Verb
   object Verb {
     case object Read  extends Verb
@@ -353,7 +353,7 @@ object documents {
     case object Exec  extends Verb
   }
 
-  case class AccessType2(read: Boolean, write: Boolean, exec: Boolean)
+  final case class AccessType2(read: Boolean, write: Boolean, exec: Boolean)
 
   /** EXERCISE 3
     *

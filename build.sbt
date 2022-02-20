@@ -9,24 +9,6 @@ lazy val `fdesign-receipts` = (project in file(".")).
   )
 
 scalacOptions ++= Seq(
-  /*"-language:higherKinds",
-  "-language:existentials",
-  "-Yrepl-class-based",
-  "-deprecation",
-  "-explaintypes",
-  "-Yrangepos",
-  "-feature",
-  "-unchecked",
-  "-Xlint:_,-type-parameter-shadow",
-  "-Ywarn-numeric-widen",
-  "-Ywarn-value-discard",
-  "-opt-warnings",
-  "-Ywarn-extra-implicit",
-  "-Ywarn-unused:_,imports",
-  "-Ywarn-unused:imports",
-  "-opt:l:inline",
-  "-opt-inline-from:<source>"*/
-
   "-Xsource:3",
   "-target:jvm-11",
   "-explaintypes",                 // Explain type errors in more detail.
@@ -65,7 +47,7 @@ scalacOptions ++= Seq(
   "-Ycache-macro-class-loader:last-modified"   // and macro definitions. This can lead to performance improvements.
 )
 
-val ZIOVersion = "1.0.7"
+val ZIOVersion = "1.0.13"
 val AmmoniteVersion = "2.5.2"
 
 libraryDependencies ++= Seq(
@@ -82,8 +64,8 @@ addCommandAlias("r", "reload")
 //fork in run := false
 
 // ammonite repl
-sourceGenerators in Test += Def.task {
-  val file = (sourceManaged in Test).value / "amm.scala"
+Test / sourceGenerators += Def.task {
+  val file = (Test / sourceManaged).value / "amm.scala"
   IO.write(file, """object amm extends App { ammonite.Main().run() }""")
   Seq(file)
 }.taskValue

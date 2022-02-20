@@ -56,40 +56,57 @@ object GADTs extends App {
     implicit case object Lng extends NumTag[Long]
   }
 
-  sealed abstract case class Coercion[-In, +Out](op: In => Try[Out])
+  final case class Coercion[-A, +B](op: A => Try[B]) extends AnyVal
 
   //A set of coercions this DSL supports
+  object Coercion {
+    implicit val A = Coercion[Int, Double](int => Try(int.toDouble))
+
+    implicit val B = Coercion[String, Double]((in: String) => Try(in.toDouble))
+
+    implicit val C = Coercion[Double, Int]((in: Double) => Try(in.toInt))
+
+    implicit val D = Coercion[Int, Float]((in: Int) => Try(in.toFloat))
+  }
+
+  /*
+  sealed abstract case class Coercion[-In, +Out](op: In => Try[Out])
   object Coercion {
     implicit object A extends Coercion[Int, Double]((in: Int) => Try(in.toDouble))
 
     implicit object B extends Coercion[String, Double]((in: String) => Try(in.toDouble))
 
     implicit object C extends Coercion[Double, Int]((in: Double) => Try(in.toInt))
+
+    implicit object D extends Coercion[Int, Float]((in: Int) => Try(in.toFloat))
   }
+   */
 
-  sealed trait DslElement[+A] {
-    self =>
+  sealed trait DslElement[+A] { self =>
 
-    def +[B >: A](that: DslElement[B])(implicit tag: NumTag[B]): DslElement[B] =
-      DslElement.Plus(self, that, tag)
+    def +[B >: A](that: DslElement[B])(implicit T: NumTag[B]): DslElement[B] =
+      DslElement.Plus(self, that, T)
 
-    def -[B >: A](that: DslElement[B])(implicit tag: NumTag[B]): DslElement[B] =
-      DslElement.Minus(self, that, tag)
+    def -[B >: A](that: DslElement[B])(implicit T: NumTag[B]): DslElement[B] =
+      DslElement.Minus(self, that, T)
 
-    def *[B >: A](that: DslElement[B])(implicit tag: NumTag[B]): DslElement[B] =
-      DslElement.Times(self, that, tag)
+    def *[B >: A](that: DslElement[B])(implicit T: NumTag[B]): DslElement[B] =
+      DslElement.Times(self, that, T)
 
-    def as[B](implicit c: Coercion[A, B], destTag: NumTag[B]): DslElement[B] =
-      DslElement.CastTo(self, c, destTag)
+    def as[B](implicit C: Coercion[A, B], T: NumTag[B]): DslElement[B] =
+      DslElement.CastTo(self, C, T)
 
-    def unary_-[B >: A](implicit N: NumTag[B]): DslElement[B] =
-      DslElement.Negate(self, N)
+    def unary_-[B >: A](implicit T: NumTag[B]): DslElement[B] =
+      DslElement.Negate(self, T)
 
-    def d(implicit c: Coercion[A, Double], destTag: NumTag[Double]): DslElement[Double] =
-      DslElement.CastTo(self, c, destTag)
+    def f(implicit C: Coercion[A, Float], T: NumTag[Float]): DslElement[Float] =
+      DslElement.CastTo(self, C, T)
 
-    def l(implicit c: Coercion[A, Long], destTag: NumTag[Long]): DslElement[Long] =
-      DslElement.CastTo(self, c, destTag)
+    def d(implicit C: Coercion[A, Double], T: NumTag[Double]): DslElement[Double] =
+      DslElement.CastTo(self, C, T)
+
+    def l(implicit C: Coercion[A, Long], T: NumTag[Long]): DslElement[Long] =
+      DslElement.CastTo(self, C, T)
   }
 
   object DslElement {
@@ -277,7 +294,7 @@ object GADTs extends App {
     //val a = -(lit(1) + lit(7)) + lit(2)
     val b = -((1.0.lit + 7.0.lit) + 10.6.lit).as[Int] * 2.lit
 
-    //1.lit.d + 45.lit  could not find implicit value for parameter tag: net.demo.GADTs.NumTag[AnyVal]
+    //1.lit.d + 45.lit //could not find implicit value for parameter tag: net.demo.GADTs.NumTag[AnyVal]
     //45.lit + 1.lit.d
 
     //TIMES|NEGATE|CAST|PLUS|PLUS|1:1.0|1:7.0|1:10.6->0|0:2

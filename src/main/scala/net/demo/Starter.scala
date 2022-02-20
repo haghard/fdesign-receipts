@@ -7,10 +7,10 @@ import scala.util.Success
 
 object Starter extends App {
 
-  final case class Coercion[-A, +B](val coerce: A => Try[B]) extends AnyVal
+  final case class Coercion[-A, +B](coerce: A => Try[B]) extends AnyVal
   object Coercion {
-    //implicit val IntToDouble = Coercion[Int, Double](int ⇒ Try(int.toDouble))
-    //implicit val StrToInt    = Coercion[String, Int](str ⇒ Try(str.toInt))
+    implicit val IntToDouble = Coercion[Int, Double](int => Try(int.toDouble))
+    implicit val StrToInt    = Coercion[String, Int](str => Try(str.toInt))
     implicit val StrToDouble = Coercion[String, Double](str => Try(str.toDouble))
   }
 
@@ -47,15 +47,16 @@ object Starter extends App {
 
   def eval[A](value: CalculatedValue[A]): A =
     value match {
-      case CalculatedValue.Const(v) => v
+      case CalculatedValue.Const(v) =>
+        v
       case CalculatedValue.Coerce(v, coercion) =>
         coercion.coerce(eval(v)) match {
           case Failure(ex) => throw new IllegalArgumentException("Couldn't apply coercion", ex)
           case Success(v)  => v
         }
-      case CalculatedValue.Both(l, r) => eval(l) + eval(r)
-      case CalculatedValue.As(a, ev)  =>
-        //println("as: " + a)
+      case CalculatedValue.Both(l, r) =>
+        eval(l) + eval(r)
+      case CalculatedValue.As(a, ev) =>
         ev(eval(a))
     }
 
