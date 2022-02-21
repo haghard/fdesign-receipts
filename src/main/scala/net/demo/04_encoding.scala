@@ -1,7 +1,4 @@
 package net.demo
-import net.demo.education_executable.cata.QuizCase.Sequence
-import net.demo.education_executable.cata.QuizCase.Bonus
-import net.demo.education_executable.cata.QuizCase.Single
 
 /*
  * INTRODUCTION
@@ -15,7 +12,7 @@ import net.demo.education_executable.cata.QuizCase.Single
  *    or case class, or an open trait that is implemented by classes, then it's
  *    probably an executable encoding.
  *
- * 2. Using a pure data structure, which declaratively describes the solution, but
+ * 2. Using a pure data structure, which declarative describes the solution, but
  *    which does not perform the solution. It's an abstract, "declarative"
  *    encoding of a domain. If some functional domain type is modeled with a
  *    sealed trait, then it's probably an abstract encoding, where the subtypes

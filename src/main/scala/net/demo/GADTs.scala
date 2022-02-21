@@ -196,15 +196,19 @@ object GADTs extends App {
       case op: Negate[T] =>
         negate(eval(op.v), op.tag)
       case castOp: CastTo[in, out] =>
-        val rawValue = eval(castOp.v)
-        castOp.cast.op(rawValue) match {
-          case Success(v) => v
-          case Failure(ex) =>
-            throw new IllegalArgumentException(
-              s"Cast error: ${rawValue.getClass.getName} -> ${castOp.tag.getClass.getName}",
-              ex
-            )
-        }
+        val rawValue: in = eval(castOp.v)
+        val result: out = castOp.cast
+          .op(rawValue)
+          .fold(
+            ex =>
+              throw new IllegalArgumentException(
+                s"Cast error: ${rawValue.getClass.getName} -> ${castOp.tag.getClass.getName}",
+                ex
+              ),
+            identity
+          )
+
+        result
       case Literal(v, _) =>
         v
 

@@ -18,8 +18,7 @@ package net.demo
   * Consider a software application that manages reward programs for businesses.
   */
 
-//Pick declarative encoding (model) if you want persist the model(rules) and
-//
+//Pick declarative encoding (model) if you want to persist the model(rules)
 object loyalty_program {
   import java.time.Instant
 
@@ -292,19 +291,16 @@ object loyalty_program {
     * Construct a rule set that describes promotion to the next tier, as
     * well as demotion, and changing the status of the user to inactive.
     */
-  def ruleSet: RuleSet = {
-
+  def ruleSet: RuleSet =
     //val a = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(30)
     //val b = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365)
     //RuleSet.when(a, SystemAction.TierDemotion) && RuleSet.when(b, SystemAction.TierDemotion)
-
     RuleSet.when(RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(30), SystemAction.TierDemotion) ||
-      RuleSet.when(RuleCalculation.PurchasePrice.>(RuleCalculation.PurchaseAmount(100)), SystemAction.TierPromotion) &&
-        RuleSet.when(
-          RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365),
-          SystemAction.ChangeStatus(UserProgramStatus.Inactive)
-        )
-  }
+    RuleSet.when(RuleCalculation.PurchasePrice.>(RuleCalculation.PurchaseAmount(100)), SystemAction.TierPromotion) &&
+    RuleSet.when(
+      RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365),
+      SystemAction.ChangeStatus(UserProgramStatus.Inactive)
+    )
 
   /** Example of running a rule set on the history of a user to produce system actions.
     */

@@ -2,6 +2,9 @@
 
 https://github.com/jdegoes/functional-design
 
+Far more than you've ever wanted to know about ADTs by Nicolas Rinaudo at FP in the City Conference: https://youtu.be/MqGWb7OvVqs
+
+
 https://medium.com/bigdatarepublic/writing-functional-dsls-for-business-domains-1bccc5d3f62b
 
 
