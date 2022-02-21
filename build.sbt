@@ -52,6 +52,7 @@ val AmmoniteVersion = "2.5.2"
 
 libraryDependencies ++= Seq(
   //for intro only
+  //https://repo1.maven.org/maven2/dev/zio/zio_2.13/1.0.13/
   "dev.zio" %% "zio" % ZIOVersion,
   "com.lihaoyi" % "ammonite" % AmmoniteVersion % "test" cross CrossVersion.full
 )

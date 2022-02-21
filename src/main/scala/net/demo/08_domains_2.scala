@@ -217,7 +217,8 @@ object loyalty_program {
       (self1 <= that) && (that <= self1)
     }
 
-    def as[B](implicit ev: A <:< B): RuleCalculation[B] = RuleCalculation.Widen(self)
+    def as[B](implicit ev: A <:< B): RuleCalculation[B] =
+      RuleCalculation.Widen(self)
   }
 
   object RuleCalculation {
@@ -234,7 +235,7 @@ object loyalty_program {
       * Add a constructor that models calculation of a constant value of the
       * specified type.
       */
-    final case class Constant[A](value: A) extends RuleCalculation[A]
+    final case class Days[A](value: A) extends RuleCalculation[A]
 
     final case class PurchaseAmount[A](value: Int) extends RuleCalculation[FiscalAmount]
 
@@ -291,26 +292,23 @@ object loyalty_program {
     * Construct a rule set that describes promotion to the next tier, as
     * well as demotion, and changing the status of the user to inactive.
     */
-  def ruleSet: RuleSet =
-    /*
-    val a = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Constant(30)
-    val b = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Constant(365)
+  def ruleSet: RuleSet = {
 
-    RuleSet
-      .when(a, SystemAction.TierDemotion)
-      .&&(RuleSet.when(b, SystemAction.TierDemotion))
-     */
+    //val a = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(30)
+    //val b = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365)
+    //RuleSet.when(a, SystemAction.TierDemotion) && RuleSet.when(b, SystemAction.TierDemotion)
 
-    RuleSet.when(RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Constant(30), SystemAction.TierDemotion) ||
-    RuleSet.when(RuleCalculation.PurchasePrice.>(RuleCalculation.PurchaseAmount(100)), SystemAction.TierPromotion) &&
-    RuleSet.when(
-      RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Constant(365),
-      SystemAction.ChangeStatus(UserProgramStatus.Inactive)
-    )
+    RuleSet.when(RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(30), SystemAction.TierDemotion) ||
+      RuleSet.when(RuleCalculation.PurchasePrice.>(RuleCalculation.PurchaseAmount(100)), SystemAction.TierPromotion) &&
+        RuleSet.when(
+          RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365),
+          SystemAction.ChangeStatus(UserProgramStatus.Inactive)
+        )
+  }
 
   /** Example of running a rule set on the history of a user to produce system actions.
     */
-  def run(history: List[UserAction], ruleSet: RuleSet): List[SystemAction] = ???
+  def run(history: List[UserAction], rules: RuleSet): List[SystemAction] = ???
 
   /** Example of describing a rule set in a human-readable form.
     */
@@ -320,6 +318,7 @@ object loyalty_program {
 /** CALENDER SCHEDULING APP - EXERCISE SET 2
   */
 object calendar {
+
   final case class HourOfDay(value: Int) {
     def to(that: HourOfDay): Stream[HourOfDay] = (value to that.value).toStream.map(HourOfDay(_))
 
@@ -691,6 +690,7 @@ object data_processing {
   sealed trait Data {
     def schema: Schema
   }
+
   object Data {
     abstract class AbstractData(val schema: Schema)
 
