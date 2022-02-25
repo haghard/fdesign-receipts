@@ -303,6 +303,7 @@ object GADTs extends App {
 
     //TIMES|NEGATE|CAST|PLUS|PLUS|1:1.0|1:7.0|1:10.6->0|0:2
     println(serialize(b))
+    println(eval(b))
 
     val exp = 12.lit.as[Double]
     println(serialize(exp))
