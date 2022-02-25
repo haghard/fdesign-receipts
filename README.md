@@ -1,14 +1,4 @@
-
-
-https://github.com/jdegoes/functional-design
-
-Far more than you've ever wanted to know about ADTs by Nicolas Rinaudo at FP in the City Conference: https://youtu.be/MqGWb7OvVqs
-
-
-https://medium.com/bigdatarepublic/writing-functional-dsls-for-business-domains-1bccc5d3f62b
-
-
-### Encoding
+### Encodings
 
 * Executable (initial) encoding (a case class with a raw function to execute smth)
 
@@ -37,3 +27,15 @@ There are many ways to factor a DSL, but some are better than others. These guid
  * Composable, to permit a lot of power in a small, reasonable package
  * Expressive, to solve the full range of problems in the domain
  * Orthogonal, such that no primitive provides the capabilities of any other
+
+
+### Links
+
+
+https://github.com/jdegoes/functional-design
+
+Far more than you've ever wanted to know about ADTs by Nicolas Rinaudo at FP in the City Conference: https://youtu.be/MqGWb7OvVqs
+
+https://medium.com/bigdatarepublic/writing-functional-dsls-for-business-domains-1bccc5d3f62b
+
+Declarative vs Executable Encodings: https://youtu.be/OD1Yr48-0Js
