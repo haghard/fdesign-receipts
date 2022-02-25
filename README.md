@@ -4,7 +4,7 @@
 
     +) Easy to add operators and constructors
 
-    +) Simple to understand and compose, ready to run. No need to build an AST and then interprete it
+    +) Simple to understand and compose, ready to run. No need to build an AST and then interpret it
 
     +) Performance, no extra layers
 
