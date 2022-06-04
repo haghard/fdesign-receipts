@@ -4,19 +4,22 @@ import scala.util.Try
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
-/** GADTs - Parametrically polymorphic ADT, where you are allowed to specialize a type parameter in the terms of the sum type.
+/** GADTs - Parametrically polymorphic ADT, where you are allowed to specialize a type parameter in the terms of the sum
+  * type.
   *
-  * Specialization the type T of Num inside the children together with being able to reconstruct this information in pattern matching is known as GADTs.
-  *
-  * //(Scalac knows about types in each cases)
-  * def zero[T](N: NumTag[T]): T =
-  *   N match {
-  *     case NumTag.Integer ⇒ 1    //T =:= Int
-  *     case NumTag.Dbl     ⇒ 1.0  //T =:= Double
-  *     case NumTag.Lng     ⇒ 1L   //T =:= Long
-  *     case NumTag.Flt     ⇒ 1.7f //T =:= Float
-  *   }
+  * Specialization the type T of Num inside the children together with being able to reconstruct this information in
+  * pattern matching is known as GADTs.
   */
+
+/*
+  (Scalac knows about types in each cases)
+    def zero[T](N: NumTag[T]): T =
+      N match {
+        case NumTag.Integer ⇒ 1 //T =:=* Int
+        case NumTag.Dbl ⇒ 1.0 //T =:= Double
+        case NumTag.Lng ⇒ 1L //T =:= Long
+        case NumTag.Flt ⇒ 1.7f //T =:= Float }
+*/
 
 /*
 
@@ -39,10 +42,10 @@ object TypeEquality {
 //runMain net.demo.GADTs
 object GADTs extends App {
 
-  //Declarative encoding
-  //We turn our dynamically typed model of CalculatedValue into a statically typed DSL
-  //we can't use scala.math.Numeric because it's not a sum nor a product type.
-  //As we use declarative encoding we want to have as many interpreters as we'd like.
+  // Declarative encoding
+  // We turn our dynamically typed model of CalculatedValue into a statically typed DSL
+  // we can't use scala.math.Numeric because it's not a sum nor a product type.
+  // As we use declarative encoding we want to have as many interpreters as we'd like.
 
   sealed trait NumTag[T]
 
@@ -58,7 +61,7 @@ object GADTs extends App {
 
   final case class Coercion[-A, +B](op: A => Try[B]) extends AnyVal
 
-  //A set of coercions this DSL supports
+  // A set of coercions this DSL supports
   object Coercion {
     implicit val A = Coercion[Int, Double](int => Try(int.toDouble))
 
@@ -133,9 +136,9 @@ object GADTs extends App {
       def fromStr[A](implicit ev: NumTag[A], sv: NumTag[A]): DslElement[A] =
         ev match {
           case NumTag.Integer => Try(self.toInt).map(Literal(_, sv)).getOrElse(throw new Exception("Error toInt !"))
-          case NumTag.Dbl     => Try(self.toDouble).map(Literal(_, sv)).getOrElse(throw new Exception("Error toDouble !"))
-          case NumTag.Flt     => Try(self.toFloat).map(Literal(_, sv)).getOrElse(throw new Exception("Error  toFloat !"))
-          case NumTag.Lng     => Try(self.toLong).map(Literal(_, sv)).getOrElse(throw new Exception("Error toLong !"))
+          case NumTag.Dbl => Try(self.toDouble).map(Literal(_, sv)).getOrElse(throw new Exception("Error toDouble !"))
+          case NumTag.Flt => Try(self.toFloat).map(Literal(_, sv)).getOrElse(throw new Exception("Error  toFloat !"))
+          case NumTag.Lng => Try(self.toLong).map(Literal(_, sv)).getOrElse(throw new Exception("Error toLong !"))
         }
     }
   }
@@ -143,7 +146,7 @@ object GADTs extends App {
   import NumTag._
   import DslElement._
 
-  //default interpreter
+  // default interpreter
   def eval[T](v: DslElement[T]): T = {
 
     def plus(a: T, b: T, ev: NumTag[T]): T =
@@ -258,7 +261,7 @@ object GADTs extends App {
 
   def deserialize(line: String): DslElement[_] = ???
 
-  //another open interpreter
+  // another open interpreter
   def eval2[T](v: DslElement[T]): T =
     v match {
       case op: Plus[T] =>
@@ -293,15 +296,15 @@ object GADTs extends App {
     }
 
   try {
-    //Statically typed DSL
+    // Statically typed DSL
 
-    //val a = -(lit(1) + lit(7)) + lit(2)
+    // val a = -(lit(1) + lit(7)) + lit(2)
     val b = -((1.0.lit + 7.0.lit) + 10.6.lit).as[Int] * 2.lit
 
-    //1.lit.d + 45.lit //could not find implicit value for parameter tag: net.demo.GADTs.NumTag[AnyVal]
-    //45.lit + 1.lit.d
+    // 1.lit.d + 45.lit //could not find implicit value for parameter tag: net.demo.GADTs.NumTag[AnyVal]
+    // 45.lit + 1.lit.d
 
-    //TIMES|NEGATE|CAST|PLUS|PLUS|1:1.0|1:7.0|1:10.6->0|0:2
+    // TIMES|NEGATE|CAST|PLUS|PLUS|1:1.0|1:7.0|1:10.6->0|0:2
     println(serialize(b))
     println(eval(b))
 

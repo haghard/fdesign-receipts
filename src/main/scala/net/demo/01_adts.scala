@@ -12,15 +12,11 @@ import java.time.Instant
  * In this section, you'll review basic functional domain modeling.
  */
 
-/** A person is someone who has a;
-  *  name (String)
-  *  age (Int)
+/** A person is someone who has a; name (String) age (Int)
   *
   * Product composition
   *
-  * A job title is either:
-  *  software eng
-  *  marketer
+  * A job title is either: software eng marketer
   *
   * Sum composition
   */
@@ -32,19 +28,15 @@ object credit_card {
 
   /** EXERCISE 1
     *
-    * Using only sealed traits and case classes, create an immutable data model
-    * of a credit card, which must have:
+    * Using only sealed traits and case classes, create an immutable data model of a credit card, which must have:
     *
-    *  * Number
-    *  * Name
-    *  * Expiration date
-    *  * Security code
+    * * Number * Name * Expiration date * Security code
     */
-  //type CreditCard
+  // type CreditCard
 
   sealed abstract case class CreditCardNumber private (value: Long)
 
-  //smart constructor
+  // smart constructor
   object CreditCardNumber {
     def apply(value: Long): Option[CreditCardNumber] =
       if (String.valueOf(value).length == 16) Some(new CreditCardNumber(value) {})
@@ -129,13 +121,12 @@ object credit_card {
 
   /** EXERCISE 2
     *
-    * Using only sealed traits and case classes, create an immutable data model
-    * of a product, which could be a physical product, such as a gallon of milk,
-    * or a digital product, such as a book or movie, or access to an event, such
-    * as a music concert or film showing.
+    * Using only sealed traits and case classes, create an immutable data model of a product, which could be a physical
+    * product, such as a gallon of milk, or a digital product, such as a book or movie, or access to an event, such as a
+    * music concert or film showing.
     */
 
-  //1st solution
+  // 1st solution
   sealed trait MyProduct {
     def name: String
     def price: BigDecimal
@@ -147,7 +138,7 @@ object credit_card {
     final case class Event(name: String, price: BigDecimal)                  extends MyProduct
   }
 
-  //downsides: too much boilerplate
+  // downsides: too much boilerplate
   def updatePrice(p: MyProduct, newPrice: BigDecimal) =
     p match {
       case p @ MyProduct.Physical(_, _, _) => p.copy(price = newPrice)
@@ -155,7 +146,7 @@ object credit_card {
       case p @ MyProduct.Event(_, _)       => p.copy(price = newPrice)
     }
 
-  //2nd solution(less boilerplate)
+  // 2nd solution(less boilerplate)
   sealed trait MyProductType
   object MyProductType {
     object Physical extends MyProductType
@@ -170,17 +161,15 @@ object credit_card {
 
   /** EXERCISE 3
     *
-    * Using only sealed traits and case classes, create an immutable data model
-    * of a product price, which could be one-time purchase fee, or a recurring
-    * fee on some regular interval.
+    * Using only sealed traits and case classes, create an immutable data model of a product price, which could be
+    * one-time purchase fee, or a recurring fee on some regular interval.
     */
   type PricingScheme
 }
 
 /** EVENT PROCESSING - EXERCISE SET 3
   *
-  * Consider an event processing application, which processes events from both
-  * devices, as well as users.
+  * Consider an event processing application, which processes events from both devices, as well as users.
   */
 object events {
   /*
@@ -223,10 +212,10 @@ object events {
   class UserAccountCreated(id: Int, val userName: String, val time: Instant) extends Event(id) with UserEvent
    */
 
-  //Pull out the common parts and push the differences deeper
+  // Pull out the common parts and push the differences deeper
   final case class Event(id: Long, when: Instant, content: EventContent)
 
-  //push the sums deeper
+  // push the sums deeper
   sealed trait EventContent
   object EventContent {
     final case class UserEvent(userId: Long, userEventContent: UserEventContent)         extends EventContent
@@ -281,6 +270,89 @@ object events2 {
     }
 }
 
+object events3 {
+  // Polymorphic content
+
+  final case class Event[+T](when: Long, content: T)
+
+  sealed trait Content[+T]
+  object Content {
+    final case class UserEvent[+T](userId: Long, userContent: T)       extends Content[T]
+    final case class DeviceEvent[+T](deviceId: Long, deviceContent: T) extends Content[T]
+  }
+
+  sealed trait UserContent
+  object UserContent {
+    final case class UserCreated(location: String, status: String, when: Long) extends UserContent
+    final case class UserDeleted(when: Long)                                   extends UserContent
+    final case class UserNameUpdated(newUserName: String, when: Long)          extends UserContent
+  }
+
+  sealed trait DeviceContent
+  object DeviceContent {
+    final case class DeviceUpdated(src: String, reading: Option[Double]) extends DeviceContent
+    final case object DeviceActivated                                    extends DeviceContent
+  }
+
+  import Content._
+
+  val usrEvent: Event[UserEvent[UserContent]] = ???
+  usrEvent match {
+    case Event(when, UserEvent(userId, userContent)) =>
+      userContent match {
+        case UserContent.UserCreated(location, status, when) =>
+          ???
+        case UserContent.UserDeleted(when)                  => ???
+        case UserContent.UserNameUpdated(newUserName, when) => ???
+      }
+    // case Event(when, DeviceEvent(userId, content)) => ??? //scalac error
+  }
+
+  val dvsEvent: Event[DeviceEvent[DeviceContent]] = ???
+  dvsEvent match {
+    case Event(when, DeviceEvent(deviceId, deviceContent)) =>
+      deviceContent match {
+        case DeviceContent.DeviceUpdated(src, reading) => ???
+        case DeviceContent.DeviceActivated             => ???
+      }
+    // case Event(when, UserEvent(userId, userContent)) => ??? //scalac error
+  }
+
+}
+
+object events4 {
+
+  // flat representation
+  sealed trait Event {
+    // captures as much commonality as you could
+    def id: Long
+    def time: Instant
+  }
+
+  object Event {
+    sealed trait UserEvent extends Event {
+      def userName: String
+    }
+
+    final case class UserCreated(id: Long, time: Instant, userName: String) extends UserEvent
+    final case class UserDeleted(id: Long, time: Instant, userName: String) extends UserEvent
+
+    sealed trait DeviceEvent extends Event {
+      def deviceId: Long
+    }
+    final case class DeviceUpdated(id: Long, time: Instant, deviceId: Long)   extends DeviceEvent
+    final case class DeviceActivated(id: Long, time: Instant, deviceId: Long) extends DeviceEvent
+  }
+
+  val event: Event = ???
+
+  event match {
+    case Event.UserCreated(_, _, userName)     => ???
+    case Event.DeviceActivated(_, _, deviceId) => ???
+  }
+
+}
+
 object events0 {
 
   sealed trait Event {
@@ -294,24 +366,24 @@ object events0 {
   final case class RefundEvent(id: String, name: String, orderId: Long)            extends Event
 
   def changeName /*[T <: Event]*/ (e: Event, newName: String): Event = e match {
-    case e: PurchasedEvent => e.copy(name = newName) //.asInstanceOf[T]
-    case e: RefundEvent    => e.copy(name = newName) //.asInstanceOf[T]
+    case e: PurchasedEvent => e.copy(name = newName) // .asInstanceOf[T]
+    case e: RefundEvent    => e.copy(name = newName) // .asInstanceOf[T]
   }
 
-  //OR
+  // OR
 
-  //Encapsulate all the differences into a sum type
+  // Encapsulate all the differences into a sum type
   sealed trait Payload
   object Payload {
     final case class Purchase(details: OrderDetails) extends Payload
     final case class Refund(orderId: Long)           extends Payload
   }
 
-  //Commonalities
+  // Commonalities
   final case class Event0(
     id: String,
-    name: String,    //common fields
-    payload: Payload //differences
+    name: String,    // common fields
+    payload: Payload // differences
   )
 
   def changeName0(e: Event0, newName: String): Event0 =
@@ -321,8 +393,8 @@ object events0 {
 
 /** DOCUMENT EDITING - EXERCISE SET 4
   *
-  * Consider a web application that allows users to edit and store documents
-  * of some type (which is not relevant for these exercises).
+  * Consider a web application that allows users to edit and store documents of some type (which is not relevant for
+  * these exercises).
   */
 object documents {
   final case class UserId(identifier: String)
@@ -331,20 +403,18 @@ object documents {
 
   /** EXERCISE 1
     *
-    * Using only sealed traits and case classes, create a simplified but somewhat
-    * realistic model of a Document.
+    * Using only sealed traits and case classes, create a simplified but somewhat realistic model of a Document.
     */
-  //type Document
+  // type Document
 
   final case class Document(id: DocId, user: UserId, cnt: DocContent)
 
   /** EXERCISE 2
     *
-    * Using only sealed traits and case classes, create a model of the access
-    * type that a given user might have with respect to a document. For example,
-    * some users might have read-only permission on a document.
+    * Using only sealed traits and case classes, create a model of the access type that a given user might have with
+    * respect to a document. For example, some users might have read-only permission on a document.
     */
-  //type AccessType
+  // type AccessType
   final case class AccessType(verbs: Set[Verb])
   sealed trait Verb
   object Verb {
@@ -357,9 +427,8 @@ object documents {
 
   /** EXERCISE 3
     *
-    * Using only sealed traits and case classes, create a model of the
-    * permissions that a user has on a set of documents they have access to.
-    * Do not store the document contents themselves in this model.
+    * Using only sealed traits and case classes, create a model of the permissions that a user has on a set of documents
+    * they have access to. Do not store the document contents themselves in this model.
     */
   type DocPermissions
 }
@@ -378,18 +447,16 @@ object bank {
 
   /** EXERCISE 2
     *
-    * Using only sealed traits and case classes, develop a model of an account
-    * type. For example, one account type allows the user to write checks
-    * against a given currency. Another account type allows the user to earn
-    * interest at a given rate for the holdings in a given currency.
+    * Using only sealed traits and case classes, develop a model of an account type. For example, one account type
+    * allows the user to write checks against a given currency. Another account type allows the user to earn interest at
+    * a given rate for the holdings in a given currency.
     */
   type AccountType
 
   /** EXERCISE 3
     *
-    * Using only sealed traits and case classes, develop a model of a bank
-    * account, including details on the type of bank account, holdings, customer
-    * who owns the bank account, and customers who have access to the bank account.
+    * Using only sealed traits and case classes, develop a model of a bank account, including details on the type of
+    * bank account, holdings, customer who owns the bank account, and customers who have access to the bank account.
     */
   type Account
 }
@@ -402,51 +469,47 @@ object portfolio {
 
   /** EXERCISE 1
     *
-    * Using only sealed traits and case classes, develop a model of a stock
-    * exchange. Ensure there exist values for NASDAQ and NYSE.
+    * Using only sealed traits and case classes, develop a model of a stock exchange. Ensure there exist values for
+    * NASDAQ and NYSE.
     */
   type Exchange
 
   /** EXERCISE 2
     *
-    * Using only sealed traits and case classes, develop a model of a currency
-    * type.
+    * Using only sealed traits and case classes, develop a model of a currency type.
     */
   type CurrencyType
 
   /** EXERCISE 3
     *
-    * Using only sealed traits and case classes, develop a model of a stock
-    * symbol. Ensure there exists a value for Apple's stock (APPL).
+    * Using only sealed traits and case classes, develop a model of a stock symbol. Ensure there exists a value for
+    * Apple's stock (APPL).
     */
   type StockSymbol
 
   /** EXERCISE 4
     *
-    * Using only sealed traits and case classes, develop a model of a portfolio
-    * held by a user of the web application.
+    * Using only sealed traits and case classes, develop a model of a portfolio held by a user of the web application.
     */
   type Portfolio
 
   /** EXERCISE 5
     *
-    * Using only sealed traits and case classes, develop a model of a user of
-    * the web application.
+    * Using only sealed traits and case classes, develop a model of a user of the web application.
     */
   type User
 
   /** EXERCISE 6
     *
-    * Using only sealed traits and case classes, develop a model of a trade type.
-    * Example trade types might include Buy and Sell.
+    * Using only sealed traits and case classes, develop a model of a trade type. Example trade types might include Buy
+    * and Sell.
     */
   type TradeType
 
   /** EXERCISE 7
     *
-    * Using only sealed traits and case classes, develop a model of a trade,
-    * which involves a particular trade type of a specific stock symbol at
-    * specific prices.
+    * Using only sealed traits and case classes, develop a model of a trade, which involves a particular trade type of a
+    * specific stock symbol at specific prices.
     */
   type Trade
 }

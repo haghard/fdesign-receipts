@@ -56,8 +56,7 @@ object loyalty_program {
       copy(holdings = holdings.updated(that._1, holdings.get(that._1).map(_ + that._2).getOrElse(that._2)))
   }
 
-  /** Every loyalty program is issued by a supplier, has an associated currency,
-    * and has an ordered list of tiers.
+  /** Every loyalty program is issued by a supplier, has an associated currency, and has an ordered list of tiers.
     */
   final case class LoyaltyProgram(defaultTier: Tier, tiers: List[Tier], supplier: Supplier, currency: LoyaltyCurrency)
 
@@ -69,8 +68,7 @@ object loyalty_program {
 
   final case class EarnRate(loyaltyCurrency: LoyaltyCurrency, fiscalCurrency: FiscalCurrency)
 
-  /** Tiers contain rule sets that define loyalty point rules for users who are
-    * currently in the tier.
+  /** Tiers contain rule sets that define loyalty point rules for users who are currently in the tier.
     */
   final case class Tier(benefits: Set[Benefit], name: String, description: String, legalese: String, ruleSet: RuleSet)
 
@@ -81,14 +79,13 @@ object loyalty_program {
    * to conditions being met. For example, if a user spends so much money,
    * then they may be eligible for an automatic tier promotion.
    */
-  //declarative enc
+  // declarative enc
   sealed trait RuleSet { self =>
 
     /** EXERCISE 1
       *
-      * Augment `RuleSet` with an operator that models combining two rule sets
-      * into one, applying either the left (if it results in an action) or the
-      * right (if the left does not result in an action)
+      * Augment `RuleSet` with an operator that models combining two rule sets into one, applying either the left (if it
+      * results in an action) or the right (if the left does not result in an action)
       */
     def &&(that: RuleSet): RuleSet = RuleSet.Both(self, that)
 
@@ -102,9 +99,8 @@ object loyalty_program {
 
     /** EXERCISE 2
       *
-      * Augment `RuleSet` with a constructor that models execution of a
-      * `SystemAction` whenever a `RuleCalculation[Boolean]` evaluates to
-      * true.
+      * Augment `RuleSet` with a constructor that models execution of a `SystemAction` whenever a
+      * `RuleCalculation[Boolean]` evaluates to true.
       */
     final case class When(calc: RuleCalculation[Boolean], action: SystemAction) extends RuleSet
 
@@ -115,9 +111,8 @@ object loyalty_program {
 
     /** EXERCISE 3
       *
-      * Add an operator `&&` that applies only with this calculation and the other
-      * calculation produce booleans, and which models the boolean conjunction
-      * ("and") of the two boolean values.
+      * Add an operator `&&` that applies only with this calculation and the other calculation produce booleans, and
+      * which models the boolean conjunction ("and") of the two boolean values.
       */
     def &&(that: RuleCalculation[Boolean])(implicit ev: A <:< Boolean): RuleCalculation[Boolean] = {
       // This line of code "proves" that the "A" type is actually a Boolean:
@@ -127,9 +122,8 @@ object loyalty_program {
 
     /** EXERCISE 4
       *
-      * Add an operator `||` that applies only with this calculation and the other
-      * calculation produce booleans, and which models the boolean disjunction
-      * ("or") of the two boolean values.
+      * Add an operator `||` that applies only with this calculation and the other calculation produce booleans, and
+      * which models the boolean disjunction ("or") of the two boolean values.
       */
     def ||(that: RuleCalculation[Boolean])(implicit ev: A <:< Boolean): RuleCalculation[Boolean] = {
       // This line of code "proves" that the "A" type is actually a Boolean:
@@ -139,8 +133,8 @@ object loyalty_program {
 
     /** EXERCISE 5
       *
-      * Add an operator `negate` that applies only with this calculation produces
-      * a boolean, and which models the boolean negation of this value.
+      * Add an operator `negate` that applies only with this calculation produces a boolean, and which models the
+      * boolean negation of this value.
       */
     def unary_!(implicit ev: A <:< Boolean): RuleCalculation[Boolean] = {
       // This line of code "proves" that the "A" type is actually a Boolean:
@@ -150,10 +144,8 @@ object loyalty_program {
 
     /** EXERCISE 6
       *
-      * Add an operator `>` that applies only when this calculation and the
-      * other calculation produce amounts, and which models the `>` comparison
-      * between the two amounts, which yields a boolean indicating if the
-      * relation holds.
+      * Add an operator `>` that applies only when this calculation and the other calculation produce amounts, and which
+      * models the `>` comparison between the two amounts, which yields a boolean indicating if the relation holds.
       */
     def >[Currency: Numeric](that: RuleCalculation[Currency])(implicit ev: A <:< Currency): RuleCalculation[Boolean] = {
       // This line of code "proves" that the "A" type is actually a Currency:
@@ -163,10 +155,9 @@ object loyalty_program {
 
     /** EXERCISE 7
       *
-      * Add an operator `>=` that applies only when this calculation and the
-      * other calculation produce amounts, and which models the `>=` comparison
-      * between the two amounts, which yields a boolean indicating if the
-      * relation holds.
+      * Add an operator `>=` that applies only when this calculation and the other calculation produce amounts, and
+      * which models the `>=` comparison between the two amounts, which yields a boolean indicating if the relation
+      * holds.
       */
     def >=[Currency: Numeric](
       that: RuleCalculation[Currency]
@@ -178,10 +169,8 @@ object loyalty_program {
 
     /** EXERCISE 8
       *
-      * Add an operator `<` that applies only when this calculation and the
-      * other calculation produce amounts, and which models the `<` comparison
-      * between the two amounts, which yields a boolean indicating if the
-      * relation holds.
+      * Add an operator `<` that applies only when this calculation and the other calculation produce amounts, and which
+      * models the `<` comparison between the two amounts, which yields a boolean indicating if the relation holds.
       */
     def <[Currency: Numeric](that: RuleCalculation[Currency])(implicit ev: A <:< Currency): RuleCalculation[Boolean] = {
       val self1: RuleCalculation[Currency] = self.as[Currency]
@@ -190,24 +179,23 @@ object loyalty_program {
 
     /** EXERCISE 9
       *
-      * Add an operator `<=` that applies only when this calculation and the
-      * other calculation produce amounts, and which models the `<=` comparison
-      * between the two amounts, which yields a boolean indicating if the
-      * relation holds.
+      * Add an operator `<=` that applies only when this calculation and the other calculation produce amounts, and
+      * which models the `<=` comparison between the two amounts, which yields a boolean indicating if the relation
+      * holds.
       */
     def <=[Currency: Numeric](
       that: RuleCalculation[Currency]
     )(implicit ev: A <:< Currency): RuleCalculation[Boolean] = {
       // This line of code "proves" that the "A" type is actually a Currency:
       val self1: RuleCalculation[Currency] = self.as[Currency]
-      //that <= self1
+      // that <= self1
       RuleCalculation.LessOrEqualTo(self1, that)
     }
 
     /** EXERCISE 10
       *
-      * Add an operator `===` that applies only when this calculation and the other calculation
-      * produce amounts, and which models equality.
+      * Add an operator `===` that applies only when this calculation and the other calculation produce amounts, and
+      * which models equality.
       */
     def ===[Currency: Numeric](
       that: RuleCalculation[Currency]
@@ -231,8 +219,7 @@ object loyalty_program {
 
     /** EXERCISE 10
       *
-      * Add a constructor that models calculation of a constant value of the
-      * specified type.
+      * Add a constructor that models calculation of a constant value of the specified type.
       */
     final case class Days[A](value: A) extends RuleCalculation[A]
 
@@ -240,22 +227,19 @@ object loyalty_program {
 
     /** EXERCISE 11
       *
-      * Add a constructor that models calculation of the price of an item that
-      * the user buys, in a fiscal currency.
+      * Add a constructor that models calculation of the price of an item that the user buys, in a fiscal currency.
       */
     final case object PurchasePrice extends RuleCalculation[FiscalAmount]
 
     /** EXERCISE 12
       *
-      * Add a constructor that models calculation of the price of an item that
-      * the user buys, in a fiscal currency.
+      * Add a constructor that models calculation of the price of an item that the user buys, in a fiscal currency.
       */
     final case object ItemPrice extends RuleCalculation[FiscalAmount]
 
     /** EXERCISE 13
       *
-      * Add a constructor that models the number of days since the last purchase
-      * of the user, as an integer.
+      * Add a constructor that models the number of days since the last purchase of the user, as an integer.
       */
     final case object DaysSinceLastPurchase extends RuleCalculation[Int]
   }
@@ -288,19 +272,19 @@ object loyalty_program {
 
   /** EXERCISE 14
     *
-    * Construct a rule set that describes promotion to the next tier, as
-    * well as demotion, and changing the status of the user to inactive.
+    * Construct a rule set that describes promotion to the next tier, as well as demotion, and changing the status of
+    * the user to inactive.
     */
   def ruleSet: RuleSet =
-    //val a = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(30)
-    //val b = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365)
-    //RuleSet.when(a, SystemAction.TierDemotion) && RuleSet.when(b, SystemAction.TierDemotion)
+    // val a = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(30)
+    // val b = RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365)
+    // RuleSet.when(a, SystemAction.TierDemotion) && RuleSet.when(b, SystemAction.TierDemotion)
     RuleSet.when(RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(30), SystemAction.TierDemotion) ||
-    RuleSet.when(RuleCalculation.PurchasePrice.>(RuleCalculation.PurchaseAmount(100)), SystemAction.TierPromotion) &&
-    RuleSet.when(
-      RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365),
-      SystemAction.ChangeStatus(UserProgramStatus.Inactive)
-    )
+      RuleSet.when(RuleCalculation.PurchasePrice.>(RuleCalculation.PurchaseAmount(100)), SystemAction.TierPromotion) &&
+      RuleSet.when(
+        RuleCalculation.DaysSinceLastPurchase > RuleCalculation.Days(365),
+        SystemAction.ChangeStatus(UserProgramStatus.Inactive)
+      )
 
   /** Example of running a rule set on the history of a user to produce system actions.
     */
@@ -355,17 +339,17 @@ object calendar {
 
   /** EXERCISE 1
     *
-    * Explore the structure of `CalendarAppointment` by deciding what composable,
-    * orthogonal operations to add to the data type.
+    * Explore the structure of `CalendarAppointment` by deciding what composable, orthogonal operations to add to the
+    * data type.
     */
-  //Executable because it could have been span: () => TimeSpan
+  // Executable because it could have been span: () => TimeSpan
   final case class CalendarAppointment(span: TimeSpan) { self =>
 
     def complement: Set[CalendarAppointment] =
       (if (span.start.value > 0) Set(CalendarAppointment(TimeSpan(HourOfDay(0), span.start)))
        else Set()) ++
-      (if (span.end.value < 24) Set(CalendarAppointment(TimeSpan(span.end, HourOfDay(24))))
-       else Set())
+        (if (span.end.value < 24) Set(CalendarAppointment(TimeSpan(span.end, HourOfDay(24))))
+         else Set())
 
     def length: Int = span.length
 
@@ -404,13 +388,13 @@ object calendar {
   object CalendarAppointment {
     val empty: CalendarAppointment = CalendarAppointment(TimeSpan.empty)
     val full: CalendarAppointment  = CalendarAppointment(TimeSpan(HourOfDay(0), HourOfDay(24)))
-    //boundaries
+    // boundaries
   }
 
   /** EXERCISE 2
     *
-    * Explore the structure of `DailySchedule` by deciding what composable,
-    * orthogonal operations to add to the data type.
+    * Explore the structure of `DailySchedule` by deciding what composable, orthogonal operations to add to the data
+    * type.
     */
   /*
   final case class DailySchedule(set: Set[CalendarAppointment]) { self =>
@@ -460,8 +444,8 @@ object calendar {
 
   /** EXERCISE 3
     *
-    * Explore the structure of `MonthlySchedule` by deciding what composable,
-    * orthogonal operations to add to the data type.
+    * Explore the structure of `MonthlySchedule` by deciding what composable, orthogonal operations to add to the data
+    * type.
     */
 
   final case class MonthlySchedule(daysOfMonth: Vector[DailySchedule]) { self =>
@@ -482,9 +466,8 @@ object calendar {
 
   /** EXERCISE 4
     *
-    * Using the operators you build, express a solution to the following
-    * problem: find all the free times that a group of friends can virtually
-    * meet for the specified number of hours.
+    * Using the operators you build, express a solution to the following problem: find all the free times that a group
+    * of friends can virtually meet for the specified number of hours.
     */
   def findFreeTimes(lengthInHours: Int, friends: Map[Person, MonthlySchedule]): MonthlySchedule =
     friends.values.reduceOption(_ union _).getOrElse(MonthlySchedule.empty)
@@ -541,7 +524,7 @@ object cms {
 
     def embed(header: Html, footer: Html): Component[Context, State] = ???
 
-    //binary composition
+    // binary composition
     def ++[Context1 <: Context, State2](that: Component[Context1, State2]): Component[Context1, (State, State2)] =
       ???
 
@@ -568,18 +551,16 @@ object cms {
 
 /** JSON VALIDATION - EXERCISE SET 4
   *
-  * Consider a domain where incoming JSON documents are stored into a NoSQL
-  * database, but before being stored, they must be validated by flexible
-  * rules. If validation fails, descriptive error messages must be generated
-  * that allow clients of the JSON endpoint to fix the issues with their data.
+  * Consider a domain where incoming JSON documents are stored into a NoSQL database, but before being stored, they must
+  * be validated by flexible rules. If validation fails, descriptive error messages must be generated that allow clients
+  * of the JSON endpoint to fix the issues with their data.
   */
 object input_validation {
   sealed trait Json {
 
     /** EXERCISE 1
       *
-      * Implement a method to retrieve the JSON value at the specified path, or
-      * fail with a descriptive error message.
+      * Implement a method to retrieve the JSON value at the specified path, or fail with a descriptive error message.
       */
     def get(path: JsonPath): Either[String, Json] = ???
   }
@@ -614,29 +595,25 @@ object input_validation {
 
   /** REQUIREMENTS
     *
-    * 1. Verify that a JSON path is a string, number, null, boolean, object, or array.
-    * 2. Verify that numbers are integer, non-zero, or within some range.
-    * 3. Verify that one part of a JSON value constraints another part.
-    * 4. Verify that a string can be interpreted as an ISO date time.
-    * 5. Verify that an object has a field.
-    * 6. Verify that an array has a certain minimum length.
-    * 7. Verify that a field in an object meets certain requirements.
-    * 8. Verify that an element in an array meets certain requirements.
-    * 9. Verify that all elements in an array meet certain requirements.
+    *   1. Verify that a JSON path is a string, number, null, boolean, object, or array. 2. Verify that numbers are
+    *      integer, non-zero, or within some range. 3. Verify that one part of a JSON value constraints another part. 4.
+    *      Verify that a string can be interpreted as an ISO date time. 5. Verify that an object has a field. 6. Verify
+    *      that an array has a certain minimum length. 7. Verify that a field in an object meets certain requirements.
+    *      8. Verify that an element in an array meets certain requirements. 9. Verify that all elements in an array
+    *      meet certain requirements.
     */
   type Validation[+A]
   object Validation {}
 
-  /** Implement the `validate` function that can validate some JSON and either
-    * return descriptive error messages, or succeed with a unit value.
+  /** Implement the `validate` function that can validate some JSON and either return descriptive error messages, or
+    * succeed with a unit value.
     */
   def validate[A](json: Json, validation: Validation[A]): Either[List[String], A] = ???
 }
 
 /** GRADUATION PROJECT
   *
-  * Consider a domain where data must be loaded from various sources, processed
-  * through a flexible graph of components.
+  * Consider a domain where data must be loaded from various sources, processed through a flexible graph of components.
   */
 object data_processing {
 
@@ -678,9 +655,9 @@ object data_processing {
 
     lazy val personSchema: Schema =
       hasField("name", string) &
-      hasField("age", number | nulls) &
-      hasField("address", list(string)) &
-      hasField("manager", personSchema | nulls)
+        hasField("age", number | nulls) &
+        hasField("address", list(string)) &
+        hasField("manager", personSchema | nulls)
   }
 
   sealed trait Data {
@@ -714,9 +691,8 @@ object data_processing {
 
   /** EXERCISE 1
     *
-    * Design a data type that can model schema transformations, as well as value
-    * transformations (e.g. replacing nulls with values, replacing one type of
-    * value with another type.
+    * Design a data type that can model schema transformations, as well as value transformations (e.g. replacing nulls
+    * with values, replacing one type of value with another type.
     */
   sealed trait Transformation {}
   object Transformation       {}

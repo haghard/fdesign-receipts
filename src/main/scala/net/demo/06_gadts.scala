@@ -62,9 +62,9 @@ object Motivation {
   val a = const(Value.Str("a"))
   val b = const(Value.Str("a"))
 
-  //What we have here as a dynamically typed dsl.
-  //As a result, we have no idea if the result of a + b is valid or not. Scalac doesn't help here.
-  //We need to turn your dynamically typed DSL to a statically typed.
+  // What we have here as a dynamically typed dsl.
+  // As a result, we have no idea if the result of a + b is valid or not. Scalac doesn't help here.
+  // We need to turn your dynamically typed DSL to a statically typed.
   val s: SpreadSheet = ???
 
   (a + b).eval(s)
@@ -92,15 +92,15 @@ object MotivationExecutable2 {
     }
   }
 
-  //Parametrically polymorphic ADT
+  // Parametrically polymorphic ADT
   final case class CalculatedValue[+A](eval: SpreadSheet => A) { self =>
-    //works only for ints
-    //def +++(that: CalculatedValue[Int])(implicit ev: A <:< Int) = CalculatedValue(ss ⇒ ev(self.eval(ss)) + that.eval(ss))
-    //works only for doubles
-    //def ++(that: CalculatedValue[Double])(implicit ev: A <:< Double) = CalculatedValue(ss ⇒ ev(self.eval(ss)) + that.eval(ss))
+    // works only for ints
+    // def +++(that: CalculatedValue[Int])(implicit ev: A <:< Int) = CalculatedValue(ss ⇒ ev(self.eval(ss)) + that.eval(ss))
+    // works only for doubles
+    // def ++(that: CalculatedValue[Double])(implicit ev: A <:< Double) = CalculatedValue(ss ⇒ ev(self.eval(ss)) + that.eval(ss))
 
-    //if you're using declaration side covariance `final case class CalculatedValue[+A]` the "+"" sign
-    //you going to have type bounds `def +[B >: A]` on all the methods that accept that as input.
+    // if you're using declaration side covariance `final case class CalculatedValue[+A]` the "+"" sign
+    // you going to have type bounds `def +[B >: A]` on all the methods that accept that as input.
     def +[B >: A](that: CalculatedValue[B])(implicit scalaNum: Numeric[B]): CalculatedValue[B] =
       CalculatedValue[B] { ss =>
         scalaNum.plus(self.eval(ss), that.eval(ss))
@@ -129,7 +129,7 @@ object MotivationExecutable2 {
 
   import CalculatedValue._
 
-  //val res = - v(9L) + v(4L)
+  // val res = - v(9L) + v(4L)
 
   left(6) + right(67)
 
@@ -147,8 +147,8 @@ object MotivationDeclarative2 {
     def markRight[T](v: T): T
   }
 
-  //we can't use scala.math.Numeric because it's not a sum nor product type
-  sealed trait Numrc[T] { //self ⇒
+  // we can't use scala.math.Numeric because it's not a sum nor product type
+  sealed trait Numrc[T] { // self ⇒
     /*
     protected def plus[T: Numrc](a: T, b: T, N: Numrc[T]): T =
       N match {
@@ -179,11 +179,11 @@ object MotivationDeclarative2 {
     def negate(a: T)(implicit ev: Numrc[T]): T  = neg[T](a, self)
      */
 
-    //def match2(a: T, b: T)(isInt: (Int, Int) ⇒ Int, isLong: (Long, Long) ⇒ Long, isDbl: (Double, Double) ⇒ Double): T
+    // def match2(a: T, b: T)(isInt: (Int, Int) ⇒ Int, isLong: (Long, Long) ⇒ Long, isDbl: (Double, Double) ⇒ Double): T
   }
 
   object Numrc {
-    //def match2(a: Int,b: Int)(isInt: (Int, Int) ⇒ Int, isLong: (Long, Long) ⇒ Long, isDbl: (Double, Double) ⇒ Double): Int =  isInt(a, b)
+    // def match2(a: Int,b: Int)(isInt: (Int, Int) ⇒ Int, isLong: (Long, Long) ⇒ Long, isDbl: (Double, Double) ⇒ Double): Int =  isInt(a, b)
     implicit case object Integer extends Numrc[Int]
     implicit case object Dbl     extends Numrc[Double]
     implicit case object Flt     extends Numrc[Float]
@@ -220,7 +220,7 @@ object MotivationDeclarative2 {
     }
   }
 
-  //def plus[A](a: A, b: A, n: Numrc[A]) = n.match2(a, b)(_ + _, _ + _, _ + _)
+  // def plus[A](a: A, b: A, n: Numrc[A]) = n.match2(a, b)(_ + _, _ + _, _ + _)
   /*
     n match {
       case Numrc.Integer ⇒ a + b
@@ -257,7 +257,7 @@ object MotivationDeclarative2 {
        */
 
       case p: CalculatedValue.Minus[T] =>
-        //n.-(eval(a), eval(b))(n)
+        // n.-(eval(a), eval(b))(n)
         p.N match {
           case Numrc.Integer => eval(p.a) - eval(p.b)
           case Numrc.Dbl     => eval(p.a) - eval(p.b)
@@ -280,11 +280,11 @@ object MotivationDeclarative2 {
           case Numrc.Lng     => eval(p.a) * eval(p.b)
           case Numrc.Flt     => eval(p.a) * eval(p.b)
         }
-      //n.negate(eval(v))(n)
+      // n.negate(eval(v))(n)
     }
   }
 
-  //another open interpteter
+  // another open interpteter
   /*
   def eval2[T](v: CalculatedValue[T]): T =
     v match {
@@ -323,9 +323,9 @@ object MotivationDeclarative2 {
 
   import MotivationDeclarative2.CalculatedValue._
 
-  //1.3.n + 2.4.n
+  // 1.3.n + 2.4.n
 
-  //"lsdf".n doen 't compile
+  // "lsdf".n doen 't compile
 
   123.n
   val r0 = -(1.n + 7.n) + 2.n
@@ -344,8 +344,8 @@ object MotivationExecutableEncoding {
     final case class Err(err: String) extends StrictValue
   }*/
 
-  //phantom types - don't exist in runtime
-  //+ covariant
+  // phantom types - don't exist in runtime
+  // + covariant
   case class CalculatedValue[+A](eval: SpreadSheet => A /*StrictValue*/ ) { self =>
 
     def +(that: CalculatedValue[Double])(implicit ev: A <:< Double): CalculatedValue[Double] =
@@ -374,15 +374,15 @@ object MotivationExecutableEncoding {
   val right: CalculatedValue[Double] = CalculatedValue(_ => .4)
 
   import Exts._
-  //val sum0 = right add left
+  // val sum0 = right add left
 
-  //val sum1 = left + right //comp error
+  // val sum1 = left + right //comp error
 
 }
 
 object MotivationDeclarativeEncoding {
 
-  //GADT
+  // GADT
   /*
   sealed trait StrictValue[+A]
   object StrictValue {
@@ -406,8 +406,8 @@ object MotivationDeclarativeEncoding {
     implicit val IntToDouble = Coercion[Int, Double](int => Some(int.toDouble))
   }
 
-  //phantom types - don't exist in runtime
-  //+ covariant
+  // phantom types - don't exist in runtime
+  // + covariant
   sealed trait CalculatedValue[+A] { self =>
 
     def +(that: CalculatedValue[Double])(implicit ev: A <:< Double): CalculatedValue[Double] =
@@ -444,12 +444,12 @@ object MotivationDeclarativeEncoding {
           .getOrElse(throw new IllegalStateException("Couldn't not convert  !"))
 
       case CalculatedValue.Add(l, r) =>
-        //#1: value: CalculatedValue[A]
-        //#2: value: CalculatedValue[Double]
-        //#3: CalculatedValue[Double] <:< CalculatedValue[A]
-        //#4: CalculatedValue[A] =:= CalculatedValue[Double] ===> A =:= Double
+        // #1: value: CalculatedValue[A]
+        // #2: value: CalculatedValue[Double]
+        // #3: CalculatedValue[Double] <:< CalculatedValue[A]
+        // #4: CalculatedValue[A] =:= CalculatedValue[Double] ===> A =:= Double
 
-        //42.0
+        // 42.0
         eval(sheet, l) + eval(sheet, r)
       case CalculatedValue.As(a, ev) => ev(eval(sheet, a))
     }
@@ -457,19 +457,18 @@ object MotivationDeclarativeEncoding {
   val left: CalculatedValue[String]  = ???
   val right: CalculatedValue[Double] = ???
 
-  //val sum = left + right
+  // val sum = left + right
 
 }
 
 /** EXPRESSIONS - EXERCISE SET 1
   *
-  * Consider an application (such as the spreadsheet example) that needs to
-  * calculate values in a user-defined way.
+  * Consider an application (such as the spreadsheet example) that needs to calculate values in a user-defined way.
   */
 
 object expr0 {
 
-  //type-level function
+  // type-level function
   sealed trait Adder[A] {
     def add(a: A, b: A): A
   }
@@ -516,52 +515,42 @@ object expr {
 
     /** EXERCISE 1
       *
-      * Add an operator that adds two integer expressions, yielding an integer
-      * expression.
+      * Add an operator that adds two integer expressions, yielding an integer expression.
       *
-      * NOTE: Be sure to modify the `calculate` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `calculate` method below, so that it can handle the new operation.
       */
 
     final case class Add(a: Integer, b: Integer) extends CalculatedValue[Int]
 
     /** EXERCISE 2
       *
-      * Add an operator that subtracts an integer from another integer expression,
-      * yielding an integer expression.
+      * Add an operator that subtracts an integer from another integer expression, yielding an integer expression.
       *
-      * NOTE: Be sure to modify the `calculate` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `calculate` method below, so that it can handle the new operation.
       */
     final case class Subtract(a: Integer, b: Integer) extends CalculatedValue[Int]
 
     /** EXERCISE 3
       *
-      * Add an operator that multiplies two integer expressions, yielding an
-      * integer expression.
+      * Add an operator that multiplies two integer expressions, yielding an integer expression.
       *
-      * NOTE: Be sure to modify the `calculate` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `calculate` method below, so that it can handle the new operation.
       */
     final case class Multiply(a: Integer, b: Integer) extends CalculatedValue[Int]
 
     /** EXERCISE 4
       *
-      * Add an operator that concatenates two strings, yielding a string
-      * expression.
+      * Add an operator that concatenates two strings, yielding a string expression.
       *
-      * NOTE: Be sure to modify the `calculate` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `calculate` method below, so that it can handle the new operation.
       */
     final case class Concat(a: Str, b: Str) extends CalculatedValue[String]
 
     /** EXERCISE 5
       *
-      * Add an operator that determines if a string starts with a specified
-      * prefix, yielding a boolean expression.
+      * Add an operator that determines if a string starts with a specified prefix, yielding a boolean expression.
       *
-      * NOTE: Be sure to modify the `calculate` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `calculate` method below, so that it can handle the new operation.
       */
     final case class StartsWith(prefix: Str, value: Str) extends CalculatedValue[Boolean]
   }
@@ -608,11 +597,10 @@ object parser {
 
     /** EXERCISE 1
       *
-      * Add a constructor that models the production of the specified value (of
-      * any type at all), without consuming any input.
+      * Add a constructor that models the production of the specified value (of any type at all), without consuming any
+      * input.
       *
-      * NOTE: Be sure to modify the `parse` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `parse` method below, so that it can handle the new operation.
       */
     final case class Succeed[A](value: A) extends Parser[A]
 
@@ -620,28 +608,24 @@ object parser {
       *
       * Add a constructor that models failure with a string error message.
       *
-      * NOTE: Be sure to modify the `parse` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `parse` method below, so that it can handle the new operation.
       */
     final case class Fail[A](err: Error) extends Parser[Nothing]
 
     /** EXERCISE 3
       *
-      * Add an operator that can try one parser, but if that fails, try
-      * another parser.
+      * Add an operator that can try one parser, but if that fails, try another parser.
       *
-      * NOTE: Be sure to modify the `parse` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `parse` method below, so that it can handle the new operation.
       */
     final case class OrElse[A](p: Parser[A], fallback: Parser[A]) extends Parser[A]
 
     /** EXERCISE 4
       *
-      * Add an operator that parses one thing, and then parses another one,
-      * in sequence, producing a tuple of their results.
+      * Add an operator that parses one thing, and then parses another one, in sequence, producing a tuple of their
+      * results.
       *
-      * NOTE: Be sure to modify the `parse` method below, so that it can
-      * handle the new operation.
+      * NOTE: Be sure to modify the `parse` method below, so that it can handle the new operation.
       */
     final case class Sequence[A, B](a: Parser[A], b: Parser[A]) extends Parser[(A, B)]
   }

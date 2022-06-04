@@ -25,5 +25,4 @@ package net.demo
  * can provide.
  */
 
-object tour {
-}
+object tour {}

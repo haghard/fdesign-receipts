@@ -54,45 +54,44 @@ package net.demo
 
 /** EDUCATION - EXERCISE SET 1
   *
-  * Consider a console-based educational application that tests the user's
-  * knowledge of key concepts.
+  * Consider a console-based educational application that tests the user's knowledge of key concepts.
   */
 object education_executable {
   import education._
 
-  //-executable
+  // -executable
 
-  //+declarative
+  // +declarative
 
-  //from executable to final conversion
+  // from executable to final conversion
   sealed trait Quiz2 { self =>
 
     /** EXERCISE 1
       *
-      * Add an operator `+` that appends this quiz to the specified quiz. Model
-      * this as pure data using a constructor for Quiz in the companion object.
+      * Add an operator `+` that appends this quiz to the specified quiz. Model this as pure data using a constructor
+      * for Quiz in the companion object.
       */
     def +(that: Quiz2): Quiz2 =
       Quiz2.Sequential(self, that)
 
     /** EXERCISE 2
       *
-      * Add a unary operator `bonus` that marks this quiz as a bonus quiz. Model
-      * this as pure data using a constructor for Quiz in the companion object.
+      * Add a unary operator `bonus` that marks this quiz as a bonus quiz. Model this as pure data using a constructor
+      * for Quiz in the companion object.
       */
     def bonus: Quiz2 = Quiz2.Bonus(self)
   }
 
   object Quiz2 {
 
-    final case class Sequential(left: Quiz2, right: Quiz2) extends Quiz2 //recursive
-    final case class Bonus(a: Quiz2)                       extends Quiz2 //recursive
-    final case class Single(question: Question[_])         extends Quiz2 //non recursive
+    final case class Sequential(left: Quiz2, right: Quiz2) extends Quiz2 // recursive
+    final case class Bonus(a: Quiz2)                       extends Quiz2 // recursive
+    final case class Single(question: Question[_])         extends Quiz2 // non recursive
 
     def apply[A](question: Question[A]): Quiz2 = Single(question)
   }
 
-  //recursive schemas
+  // recursive schemas
   object cata {
     sealed trait QuizCase[+A] { self =>
       def map[B](f: A => B): QuizCase[B] =
@@ -138,9 +137,8 @@ object education_executable {
 
   /** EXERCISE 3
     *
-    * Implement an interpreter for the `Quiz` model that translates it into
-    * the interactive console operations that it describes, returning a
-    * QuizResult value.
+    * Implement an interpreter for the `Quiz` model that translates it into the interactive console operations that it
+    * describes, returning a QuizResult value.
     */
   def run(quiz: Quiz2): QuizResult = {
     /*quiz match {
@@ -174,17 +172,16 @@ object contact_processing2 {
 
     /** EXERCISE 1
       *
-      * Add a `+` operator that models combining two schema mappings into one,
-      * applying the effects of both in sequential order.
+      * Add a `+` operator that models combining two schema mappings into one, applying the effects of both in
+      * sequential order.
       */
     def +(that: SchemaMapping2): SchemaMapping2 =
       SchemaMapping2.Sequential(self, that)
 
     /** EXERCISE 2
       *
-      * Add an `orElse` operator that models combining two schema mappings into
-      * one, applying the effects of the first one, unless it fails, and in that
-      * case, applying the effects of the second one.
+      * Add an `orElse` operator that models combining two schema mappings into one, applying the effects of the first
+      * one, unless it fails, and in that case, applying the effects of the second one.
       */
     def orElse(that: SchemaMapping2): SchemaMapping2 =
       SchemaMapping2.OrElse(self, that)
@@ -205,16 +202,14 @@ object contact_processing2 {
 
     /** EXERCISE 4
       *
-      * Add a constructor for `SchemaMapping` that models deleting the column
-      * of the specified name.
+      * Add a constructor for `SchemaMapping` that models deleting the column of the specified name.
       */
     def delete(name: String): SchemaMapping2 = Delete(name)
   }
 
   /** EXERCISE 5
     *
-    * Implement an interpreter for the `SchemaMapping` model that translates it into
-    * changes on the contact list.
+    * Implement an interpreter for the `SchemaMapping` model that translates it into changes on the contact list.
     */
   def run(mapping: SchemaMapping2, contacts: ContactsCSV): MappingResult[ContactsCSV] =
     mapping match {
@@ -230,8 +225,8 @@ object contact_processing2 {
 
   /** BONUS EXERCISE
     *
-    * Implement an optimizer for the `SchemaMapping` model that pushes deletes to the front of the
-    * schema mapping in cases where doing so wouldn't later the result.
+    * Implement an optimizer for the `SchemaMapping` model that pushes deletes to the front of the schema mapping in
+    * cases where doing so wouldn't later the result.
     */
   def optimize(schemaMapping: SchemaMapping2): SchemaMapping2 =
     ???
@@ -239,8 +234,8 @@ object contact_processing2 {
 
 /** EMAIL CLIENT - EXERCISE SET 3
   *
-  * Consider a web email interface, which allows users to filter emails and
-  * direct them to specific folders based on custom criteria.
+  * Consider a web email interface, which allows users to filter emails and direct them to specific folders based on
+  * custom criteria.
   */
 object email_filter2 {
   final case class Address(emailAddress: String)
@@ -250,22 +245,21 @@ object email_filter2 {
 
     /** EXERCISE 1
       *
-      * Add an "and" operator that models matching an email if both the first and
-      * the second email filter match the email.
+      * Add an "and" operator that models matching an email if both the first and the second email filter match the
+      * email.
       */
     def &&(that: EmailFilter): EmailFilter = EmailFilter.And(self, that)
 
     /** EXERCISE 2
       *
-      * Add an "or" operator that models matching an email if either the first or
-      * the second email filter match the email.
+      * Add an "or" operator that models matching an email if either the first or the second email filter match the
+      * email.
       */
     def ||(that: EmailFilter): EmailFilter = EmailFilter.Or(self, that)
 
     /** EXERCISE 3
       *
-      * Add a "negate" operator that models matching an email if this email filter
-      * does NOT match an email.
+      * Add a "negate" operator that models matching an email if this email filter does NOT match an email.
       */
     def negate: EmailFilter = EmailFilter.Negate(self)
   }
@@ -281,37 +275,36 @@ object email_filter2 {
 
     /** EXERCISE 4
       *
-      * Add a constructor for `EmailFilter` that models looking to see if the
-      * subject of an email contains the specified word.
+      * Add a constructor for `EmailFilter` that models looking to see if the subject of an email contains the specified
+      * word.
       */
     def subjectContains(string: String): EmailFilter = SubjectContains(string)
 
     /** EXERCISE 5
       *
-      * Add a constructor for `EmailFilter` that models looking to see if the
-      * body of an email contains the specified word.
+      * Add a constructor for `EmailFilter` that models looking to see if the body of an email contains the specified
+      * word.
       */
     def bodyContains(string: String): EmailFilter = BodyContains(string)
 
     /** EXERCISE 6
       *
-      * Add a constructor for `EmailFilter` that models looking to see if the
-      * sender of an email is in the specified set of senders.
+      * Add a constructor for `EmailFilter` that models looking to see if the sender of an email is in the specified set
+      * of senders.
       */
     def senderIn(senders: Set[Address]): EmailFilter = SenderIn(senders)
 
     /** EXERCISE 7
       *
-      * Add a constructor for `EmailFilter` that models looking to see if the
-      * recipient of an email is in the specified set of recipients.
+      * Add a constructor for `EmailFilter` that models looking to see if the recipient of an email is in the specified
+      * set of recipients.
       */
     def recipientIn(recipients: Set[Address]): EmailFilter = RecipientIn(recipients)
   }
 
   /** EXERCISE 8
     *
-    * Implement an interpreter for the `EmailFilter` model that translates it into
-    * into tests on the specified email.
+    * Implement an interpreter for the `EmailFilter` model that translates it into into tests on the specified email.
     */
   def matches(filter: EmailFilter, email: Email): Boolean =
     filter match {
@@ -331,8 +324,7 @@ object email_filter2 {
 
   /** EXERCISE 9
     *
-    * Implement a function to print out an English-readable description of an
-    * `EmailFilter`.
+    * Implement a function to print out an English-readable description of an `EmailFilter`.
     */
   def describe(filter: EmailFilter): Unit = {
     def loop(filter: EmailFilter): String =
@@ -352,8 +344,8 @@ object email_filter2 {
 
 /** SPREADSHEET - EXERCISE SET 4
   *
-  * Consider a spreadsheet application with a bunch of cells, containing either
-  * static data or formula computed from other cells.
+  * Consider a spreadsheet application with a bunch of cells, containing either static data or formula computed from
+  * other cells.
   */
 object spreadsheet2 {
   trait Spreadsheet {
@@ -396,15 +388,15 @@ object spreadsheet2 {
 
     /** EXERCISE 1
       *
-      * Add some operators to transform one `CalculatedValue` into another `CalculatedValue`. For
-      * example, one operator could "negate" a double CalculatedValueession.
+      * Add some operators to transform one `CalculatedValue` into another `CalculatedValue`. For example, one operator
+      * could "negate" a double CalculatedValueession.
       */
     def negate: CalculatedValue = ???
 
     /** EXERCISE 2
       *
-      * Add some operators to combine `CalculatedValue`. For example, one operator
-      * could sum two double CalculatedValueessions.
+      * Add some operators to combine `CalculatedValue`. For example, one operator could sum two double
+      * CalculatedValueessions.
       */
     def sum(that: CalculatedValue): CalculatedValue = ???
   }
@@ -418,26 +410,23 @@ object spreadsheet2 {
 
     /** EXERCISE 4
       *
-      * Add a constructor that provides access to the value of the
-      * specified cell, identified by col/row.
+      * Add a constructor that provides access to the value of the specified cell, identified by col/row.
       */
     def at(col: Int, row: Int): CalculatedValue = ???
   }
 
   /** EXERCISE 5
     *
-    * Implement an interpreter for the `Value.CalculatedValue` model that translates it into
-    * static cell contents by evaluating the CalculatedValueession.
+    * Implement an interpreter for the `Value.CalculatedValue` model that translates it into static cell contents by
+    * evaluating the CalculatedValueession.
     */
   def evaluate(spreadsheet: Spreadsheet, cell: Cell): Value = ???
 }
 
 /** E-COMMERCE MARKETING - GRADUATION PROJECT
   *
-  * Consider an e-commerce marketing platform where emails are sent to users
-  * whose history matches specific patterns (for example, an event of adding
-  * a product to a shopping card, followed by an abandonment of the web
-  * session).
+  * Consider an e-commerce marketing platform where emails are sent to users whose history matches specific patterns
+  * (for example, an event of adding a product to a shopping card, followed by an abandonment of the web session).
   */
 object ecommerce_marketing {
   type Event = Map[Attribute, Value]
@@ -461,7 +450,7 @@ object ecommerce_marketing {
   }
 
   object abstract_encoding {
-    //dec
+    // dec
     sealed trait Pattern { self =>
 
       def +(that: Pattern): Pattern = Pattern.Sequence(self, that)
@@ -524,11 +513,9 @@ object ecommerce_marketing {
 
   /** EXERCISE 1
     *
-    * Develop an executable encoding of the pattern matcher. Instead of having
-    * an ADT to represent a pattern, and then interpreting that on a user
-    * history to see if there is a match, you will represent a pattern as a
-    * function or an interface that is capable of testing the user history for
-    * a match.
+    * Develop an executable encoding of the pattern matcher. Instead of having an ADT to represent a pattern, and then
+    * interpreting that on a user history to see if there is a match, you will represent a pattern as a function or an
+    * interface that is capable of testing the user history for a match.
     */
   object executable_encoding {
 

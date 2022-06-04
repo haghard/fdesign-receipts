@@ -40,15 +40,13 @@ object email_filter3 {
 
   /** EXERCISE 1
     *
-    * In the following model, which describes an email filter, there are many
-    * primitives with overlapping responsibilities. Find the smallest possible
-    * set of primitive operators and constructors, without deleting any
+    * In the following model, which describes an email filter, there are many primitives with overlapping
+    * responsibilities. Find the smallest possible set of primitive operators and constructors, without deleting any
     * constructors or operators (you may implement them in terms of primitives).
     *
-    * NOTE: You may *not* use a final encoding, which would allow you to
-    * collapse everything down to one primitive.
+    * NOTE: You may *not* use a final encoding, which would allow you to collapse everything down to one primitive.
     */
-  sealed trait EmailFilter { self => //declarative
+  sealed trait EmailFilter { self => // declarative
 
     def &&(that: EmailFilter): EmailFilter = EmailFilter.And(self, that)
 
@@ -105,8 +103,8 @@ object ui_components {
 
   /** EXERCISE 1
     *
-    * The following API is not composable—there is no domain. Introduce a
-    * domain with elements, constructors, and composable operators.
+    * The following API is not composable—there is no domain. Introduce a domain with elements, constructors, and
+    * composable operators.
     */
   trait Turtle { self =>
 
@@ -124,15 +122,15 @@ object ui_components {
 
   object executable {
 
-    //or Turtle => Turtle
+    // or Turtle => Turtle
     final case class Turtle2(run: Turtle => Unit) { self =>
       def +(that: Turtle2): Turtle2 =
         Turtle2 { turtle => self.run(turtle); that.run(turtle) }
 
-      //def goForward: Turtle2               = self + Turtle2.goForward
-      //def turnLeft(degrees: Int): Turtle2  = self + Turtle2.turnLeft(degrees)
-      //def turnRight(degrees: Int): Turtle2 = self + Turtle2.turnRight(degrees)
-      //def draw: Turtle2                    = self + Turtle2.draw
+      // def goForward: Turtle2               = self + Turtle2.goForward
+      // def turnLeft(degrees: Int): Turtle2  = self + Turtle2.turnLeft(degrees)
+      // def turnRight(degrees: Int): Turtle2 = self + Turtle2.turnRight(degrees)
+      // def draw: Turtle2                    = self + Turtle2.draw
     }
 
     object Turtle2 {
@@ -141,13 +139,13 @@ object ui_components {
 
       def turnLeft(degrees: Int): Turtle2 = Turtle2(_.turnLeft(degrees))
 
-      def turnRight(degrees: Int): Turtle2 = turnLeft(360 - degrees) //for orthogonality
-      //Turtle2(_.turnRight(degrees))
+      def turnRight(degrees: Int): Turtle2 = turnLeft(360 - degrees) // for orthogonality
+      // Turtle2(_.turnRight(degrees))
 
       val goForward: Turtle2 = Turtle2(_.goForward())
 
       val goBackward: Turtle2 = turnLeft(180) + goForward + turnLeft(180)
-      //Turtle2(_.goBackward())
+      // Turtle2(_.goBackward())
 
       val draw: Turtle2 = Turtle2(_.draw())
     }
@@ -156,7 +154,7 @@ object ui_components {
 
     (start + turnLeft(100) + turnRight(50) + draw + goForward).run(???)
 
-    //start.turnLeft(100).goForward.draw.run(???)
+    // start.turnLeft(100).goForward.draw.run(???)
 
   }
 

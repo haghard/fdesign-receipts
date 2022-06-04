@@ -29,8 +29,7 @@ object binary_values {
 
     /** EXERCISE 1
       *
-      * Choose a type such that you can implement the `compose` function in
-      * such a way that:
+      * Choose a type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(compose(a, b), c) == compose(a, compose(b, c))
@@ -48,8 +47,7 @@ object binary_values {
 
     /** EXERCISE 2
       *
-      * Choose a different type such that you can implement the `compose`
-      * function in such a way that:
+      * Choose a different type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(compose(a, b), c) == compose(a, compose(b, c))
@@ -66,8 +64,7 @@ object binary_values {
 
     /** EXERCISE 3
       *
-      * Choose a type such that you can implement the `compose`
-      * function in such a way that:
+      * Choose a type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(a, b) == compose(b, a)
@@ -84,17 +81,16 @@ object binary_values {
         b <- right
       } yield combine(a, b)
 
-    //type SomeType
+    // type SomeType
 
-    //def compose(left: SomeType, right: SomeType): SomeType = ???
+    // def compose(left: SomeType, right: SomeType): SomeType = ???
   }
 
   object Exercise4 {
 
     /** EXERCISE 4
       *
-      * Choose a different type such that you can implement the `compose`
-      * function in such a way that:
+      * Choose a different type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(a, b) == compose(b, a)
@@ -111,11 +107,9 @@ object binary_values {
 
     /** EXERCISE 5
       *
-      * Choose or create a data type such that your implementation
-      * of `compose` represents modeling "both". For example, if you have
-      * a data type that represents a query, then this `compose` could
-      * combine two queries into one query, such that both results would
-      * be queried when the model is executed.
+      * Choose or create a data type such that your implementation of `compose` represents modeling "both". For example,
+      * if you have a data type that represents a query, then this `compose` could combine two queries into one query,
+      * such that both results would be queried when the model is executed.
       */
     type SomeType[A] = zio.UIO[A]
     def compose[A](left: SomeType[A], right: SomeType[A]): SomeType[A] = left.flatMap(_ => right)
@@ -125,8 +119,7 @@ object binary_values {
 
     /** EXERCISE 6
       *
-      * Choose or create a different type such that your implementation
-      * of `compose` represents modeling "both".
+      * Choose or create a different type such that your implementation of `compose` represents modeling "both".
       */
     type SomeType
 
@@ -137,10 +130,9 @@ object binary_values {
 
     /** EXERCISE 7
       *
-      * Choose or create a data type such that your implementation
-      * of `compose` represents modeling "or". For example, if you have
-      * a data type that represents a query, then this `compose` could
-      * model running one query, but if it fails, running another.
+      * Choose or create a data type such that your implementation of `compose` represents modeling "or". For example,
+      * if you have a data type that represents a query, then this `compose` could model running one query, but if it
+      * fails, running another.
       */
     type SomeType
 
@@ -151,8 +143,7 @@ object binary_values {
 
     /** EXERCISE 8
       *
-      * Choose or create a different type such that your implementation
-      * of `compose` represents modeling "or".
+      * Choose or create a different type such that your implementation of `compose` represents modeling "or".
       */
     type SomeType
 
@@ -163,8 +154,8 @@ object binary_values {
 
     /** EXERCISE 9
       *
-      * Choose a type and a value called `identity` such that you can implement
-      * the `compose` function in such a way that:
+      * Choose a type and a value called `identity` such that you can implement the `compose` function in such a way
+      * that:
       *
       * {{{
       * compose(a, identity) == compose(identity, a) == a
@@ -183,8 +174,8 @@ object binary_values {
 
     /** EXERCISE 10
       *
-      * Choose a different type and a value called `identity` such that you can
-      * implement the `compose` function in such a way that:
+      * Choose a different type and a value called `identity` such that you can implement the `compose` function in such
+      * a way that:
       *
       * {{{
       * compose(a, identity) == compose(identity, a) == a
@@ -207,8 +198,7 @@ object binary_tcs {
 
     /** EXERCISE 1
       *
-      * Choose a type such that you can implement the `compose` function in
-      * such a way that:
+      * Choose a type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(compose(a, b), c) ~ compose(a, compose(b, c))
@@ -217,21 +207,23 @@ object binary_tcs {
       * for all `a`, `b`, `c`, where `~` means "equivalent to".
       */
     type SomeType[A] = Option[A]
-    //Future[A]
-    //List[A]
-    //(a zip b) zip c === a zip (c zip c)
+    // Future[A]
+    // List[A]
+    // (a zip b) zip c === a zip (c zip c)
 
     def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[(A, B)] =
-      for { a <- left; b <- right } yield (a, b)
-    //left zip right
+      for {
+        a <- left
+        b <- right
+      } yield (a, b)
+    // left zip right
   }
 
   object Exercise2 {
 
     /** EXERCISE 2
       *
-      * Choose a different type such that you can implement the `compose` function
-      * in such a way that:
+      * Choose a different type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(compose(a, b), c) ~ compose(a, compose(b, c))
@@ -240,19 +232,21 @@ object binary_tcs {
       * for all `a`, `b`, `c`, where `~` means "equivalent to".
       */
     type SomeType[A] = zio.Task[A]
-    //Option[A]
+    // Option[A]
 
     def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[(A, B)] =
-      for { a <- left; b <- right } yield (a, b)
+      for {
+        a <- left
+        b <- right
+      } yield (a, b)
   }
 
-  //Tuple and Either
+  // Tuple and Either
   object Exercise3 {
 
     /** EXERCISE 3
       *
-      * Choose a type such that you can implement the `compose` function in
-      * such a way that:
+      * Choose a type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(compose(a, b), c) ~ compose(a, compose(b, c))
@@ -262,7 +256,7 @@ object binary_tcs {
       */
     type SomeType[A] = zio.UIO[A]
 
-    //def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[Either[A, B]] = ???
+    // def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[Either[A, B]] = ???
 
     def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[Either[A, B]] =
       left raceEither right
@@ -273,8 +267,7 @@ object binary_tcs {
 
     /** EXERCISE 4
       *
-      * Choose a different type such that you can implement the `compose` function
-      * in such a way that:
+      * Choose a different type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(compose(a, b), c) ~ compose(a, compose(b, c))
@@ -284,15 +277,14 @@ object binary_tcs {
       */
     type SomeType[A] = zio.Task[A]
 
-    def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[Either[A, B]] = ??? //left.zip(right)
+    def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[Either[A, B]] = ??? // left.zip(right)
   }
 
   object Exercise5 {
 
     /** EXERCISE 5
       *
-      * Choose a type such that you can implement the `compose` function in
-      * such a way that:
+      * Choose a type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(a, b) ~ compose(b, a)
@@ -309,8 +301,7 @@ object binary_tcs {
 
     /** EXERCISE 6
       *
-      * Choose a different type such that you can implement the `compose` function
-      * in such a way that:
+      * Choose a different type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(a, b) ~ compose(b, a)
@@ -327,8 +318,7 @@ object binary_tcs {
 
     /** EXERCISE 7
       *
-      * Choose a type such that you can implement the `compose` function in
-      * such a way that:
+      * Choose a type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(a, b) ~ compose(b, a)
@@ -337,19 +327,18 @@ object binary_tcs {
       * for all `a`, `b`, where `~` means "equivalent to".
       */
     type SomeType[A] = Set[A]
-    //zio.Task[A]
+    // zio.Task[A]
 
     def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[Either[A, B]] =
       left.map(Left(_)) ++ right.map(Right(_))
-    //left.raceEither(right)
+    // left.raceEither(right)
   }
 
   object Exercise8 {
 
     /** EXERCISE 8
       *
-      * Choose a different type such that you can implement the `compose` function
-      * in such a way that:
+      * Choose a different type such that you can implement the `compose` function in such a way that:
       *
       * {{{
       * compose(a, b) ~ compose(b, a)
@@ -366,11 +355,9 @@ object binary_tcs {
 
     /** EXERCISE 9
       *
-      * Choose or create a data type such that your implementation
-      * of `compose` represents modeling "both". For example, if you have
-      * a data type that represents a query, then this `compose` could
-      * combine two queries into one query, such that both results would
-      * be queried when the model is executed.
+      * Choose or create a data type such that your implementation of `compose` represents modeling "both". For example,
+      * if you have a data type that represents a query, then this `compose` could combine two queries into one query,
+      * such that both results would be queried when the model is executed.
       */
     type SomeType[A]
 
@@ -381,8 +368,7 @@ object binary_tcs {
 
     /** EXERCISE 10
       *
-      * Choose or create a different type such that your implementation
-      * of `compose` represents modeling "both".
+      * Choose or create a different type such that your implementation of `compose` represents modeling "both".
       */
     type SomeType[A]
 
@@ -393,10 +379,9 @@ object binary_tcs {
 
     /** EXERCISE 11
       *
-      * Choose or create a data type such that your implementation
-      * of `compose` represents modeling "or". For example, if you have
-      * a data type that represents a query, then this `compose` could
-      * model running one query, but if it fails, running another.
+      * Choose or create a data type such that your implementation of `compose` represents modeling "or". For example,
+      * if you have a data type that represents a query, then this `compose` could model running one query, but if it
+      * fails, running another.
       */
     type SomeType[A]
 
@@ -407,8 +392,7 @@ object binary_tcs {
 
     /** EXERCISE 12
       *
-      * Choose or create a different type such that your implementation
-      * of `compose` represents modeling "or".
+      * Choose or create a different type such that your implementation of `compose` represents modeling "or".
       */
     type SomeType[A]
 
@@ -419,8 +403,8 @@ object binary_tcs {
 
     /** EXERCISE 13
       *
-      * Choose or create a type `SomeType` and a value called `identity` such
-      * that you can implement the `compose` function in such a way that:
+      * Choose or create a type `SomeType` and a value called `identity` such that you can implement the `compose`
+      * function in such a way that:
       *
       * {{{
       * compose(a, identity) ~ compose(identity, a) ~ a
@@ -429,14 +413,14 @@ object binary_tcs {
       * for all `a`, where `~` means "equivalent to".
       */
     type SomeType[A] = zio.Task[A]
-    //Option[A]
+    // Option[A]
 
     def identity: SomeType[Any] = zio.Task.unit
-    //Some(())
+    // Some(())
 
     val a =
       zio.Task(42)
-    //Some(42)
+    // Some(42)
 
     def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[(A, B)] =
       left.flatMap(l => right.map(r => (l, r)))
@@ -450,8 +434,8 @@ object binary_tcs {
 
     /** EXERCISE 14
       *
-      * Choose or create a type `SomeType` and a value called `identity` such
-      * that you can implement the `compose` function in such a way that:
+      * Choose or create a type `SomeType` and a value called `identity` such that you can implement the `compose`
+      * function in such a way that:
       *
       * {{{
       * compose(a, identity) ~ compose(identity, a) ~ a
@@ -459,17 +443,16 @@ object binary_tcs {
       *
       * for all `a`, where `~` means "equivalent to".
       *
-      * Note that `Either[A, Nothing]` is equivalent to `A`, and
-      * `Either[Nothing, A]` is equivalent to `A`.
+      * Note that `Either[A, Nothing]` is equivalent to `A`, and `Either[Nothing, A]` is equivalent to `A`.
       */
-    type SomeType[A] = zio.Task[A] //Option[A], Set[A]
+    type SomeType[A] = zio.Task[A] // Option[A], Set[A]
 
-    def identity: SomeType[Nothing] = zio.Task.never //None, Set()
+    def identity: SomeType[Nothing] = zio.Task.never // None, Set()
 
     def compose[A, B](left: SomeType[A], right: SomeType[B]): SomeType[Either[A, B]] =
       left.raceEither(right)
-    //left.map(Left(_)) orElse right.map(Right(_))
-    //left.map(Left(_)) ++ right.map(Right(_))
+    // left.map(Left(_)) orElse right.map(Right(_))
+    // left.map(Left(_)) ++ right.map(Right(_))
   }
 
 }
@@ -481,8 +464,8 @@ object imperative_values {
 
     /** EXERCISE 1
       *
-      * Choose or create a data type such that you can implement `andThen` in
-      * such a way that it models sequential composition.
+      * Choose or create a data type such that you can implement `andThen` in such a way that it models sequential
+      * composition.
       */
     type SomeType = Int => Int
 
@@ -493,8 +476,8 @@ object imperative_values {
 
     /** EXERCISE 2
       *
-      * Choose or create a different type such that you can implement `andThen` in
-      * such a way that it models sequential composition.
+      * Choose or create a different type such that you can implement `andThen` in such a way that it models sequential
+      * composition.
       */
     type SomeType
 
@@ -509,8 +492,8 @@ object imperative_tcs {
 
     /** EXERCISE 1
       *
-      * Choose or create a data type such that you can implement `andThen` in
-      * such a way that it models sequential composition.
+      * Choose or create a data type such that you can implement `andThen` in such a way that it models sequential
+      * composition.
       */
     type SomeType[A] = Option[A]
 
@@ -522,8 +505,8 @@ object imperative_tcs {
 
     /** EXERCISE 2
       *
-      * Choose or create a different type such that you can implement `andThen` in
-      * such a way that it models sequential composition.
+      * Choose or create a different type such that you can implement `andThen` in such a way that it models sequential
+      * composition.
       */
     type SomeType[A]
 
@@ -561,16 +544,14 @@ object recipes {
 
     /** EXERCISE 2
       *
-      * Implement a `combine` operation that allows combining two recipes into
-      * one, producing both items in a tuple.
+      * Implement a `combine` operation that allows combining two recipes into one, producing both items in a tuple.
       */
     def combine[B](that: Recipe[B]): Recipe[(A, B)] =
       self.flatMap(a => that.map(b => a -> b))
 
     /** EXERCISE 3
       *
-      * Implement a `tryOrElse` operation that allows trying a backup recipe,
-      * in case this recipe ends in disaster.
+      * Implement a `tryOrElse` operation that allows trying a backup recipe, in case this recipe ends in disaster.
       */
     def tryOrElse[B](that: Recipe[B]): Recipe[Either[A, B]] =
       Recipe.TryOrElse(self.map(Left(_)), that.map(Right(_)))
@@ -580,11 +561,10 @@ object recipes {
 
     /** EXERCISE 4
       *
-      * Implement a `flatMap` operation that allows deciding which recipe to
-      * make after this recipe has produced its item.
+      * Implement a `flatMap` operation that allows deciding which recipe to make after this recipe has produced its
+      * item.
       *
-      * NOTE: Be sure to update the `make` method below so that you can make
-      * recipes that use your new operation.
+      * NOTE: Be sure to update the `make` method below so that you can make recipes that use your new operation.
       */
     def flatMap[B](f: A => Recipe[B]): Recipe[B] = Recipe.FlatMap(self, f)
 

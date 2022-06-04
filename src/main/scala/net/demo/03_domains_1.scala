@@ -30,8 +30,8 @@ package net.demo
 
 /** SPREADSHEET - EXERCISE SET 1
   *
-  * Consider a spreadsheet application with a bunch of cells, containing either
-  * static data or formula computed from other cells.
+  * Consider a spreadsheet application with a bunch of cells, containing either static data or formula computed from
+  * other cells.
   */
 object spreadsheet {
   trait Spreadsheet {
@@ -72,8 +72,8 @@ object spreadsheet {
 
   /** EXERCISE 1
     *
-    * Design a data type called `CalculatedValue`, which represents a `Value` that is dynamically
-    * computed from a `Spreadsheet`.
+    * Design a data type called `CalculatedValue`, which represents a `Value` that is dynamically computed from a
+    * `Spreadsheet`.
     */
   final case class CalculatedValue(eval: Spreadsheet => Value) { self =>
 
@@ -92,8 +92,7 @@ object spreadsheet {
 
     /** EXERCISE 3
       *
-      * Add a binary operator `+` that returns a new `CalculatedValue` that is the sum of the two
-      * calculated values.
+      * Add a binary operator `+` that returns a new `CalculatedValue` that is the sum of the two calculated values.
       */
     def +(that: CalculatedValue): CalculatedValue =
       CalculatedValue { spSheet =>
@@ -105,8 +104,8 @@ object spreadsheet {
 
     /** EXERCISE 4
       *
-      * Add a binary operator `-` that returns a new `CalculatedValue` that is the difere;nce of the
-      * two calculated values.
+      * Add a binary operator `-` that returns a new `CalculatedValue` that is the difere;nce of the two calculated
+      * values.
       */
     def -(that: CalculatedValue): CalculatedValue =
       CalculatedValue { spSheet =>
@@ -127,8 +126,7 @@ object spreadsheet {
 
     /** EXERCISE 6
       *
-      * Add a constructor that provides access to the value of the
-      * specified cell, identified by col/row.
+      * Add a constructor that provides access to the value of the specified cell, identified by col/row.
       */
     def at(col: Int, row: Int): CalculatedValue =
       CalculatedValue(spSheet => spSheet.valueAt(col, row).eval(spSheet))
@@ -197,12 +195,10 @@ object etl {
 
   /** EXERCISE 1
     *
-    * Design a data type that models sources and sinks in an ETL pipeline. Assume
-    * your business requires you to extract data from (and load data to) FTP sites,
-    * URLs, AWS S3 buckets, and databases described by JDBC connection strings.
+    * Design a data type that models sources and sinks in an ETL pipeline. Assume your business requires you to extract
+    * data from (and load data to) FTP sites, URLs, AWS S3 buckets, and databases described by JDBC connection strings.
     *
-    * Also mock out, but do not implement, a method on each repository type called
-    * `load`, which returns a `DataStream`.
+    * Also mock out, but do not implement, a method on each repository type called `load`, which returns a `DataStream`.
     */
   sealed trait DataRepo {
     def load: DataStream
@@ -220,21 +216,20 @@ object etl {
 
   /** EXERCISE 2
     *
-    * Design a data type that models the type of primitives the ETL pipeline
-    * has access to. This will include string, numeric, and date/time data.
+    * Design a data type that models the type of primitives the ETL pipeline has access to. This will include string,
+    * numeric, and date/time data.
     */
   sealed trait DataType
   object DataType {
     object Text extends DataType
-    //object Numeric extends DataType
+    // object Numeric extends DataType
     object DateTime extends DataType
   }
 
   /** EXERCISE 3
     *
-    * Design a data type that models a value. Every value should have a `DataType`
-    * that identifies its type (string, numeric, or data/time), and a `coerce` method
-    * to coerce the value into another type.
+    * Design a data type that models a value. Every value should have a `DataType` that identifies its type (string,
+    * numeric, or data/time), and a `coerce` method to coerce the value into another type.
     *
     * Be sure to model null, string, and integer, at the very least!
     */
@@ -250,7 +245,7 @@ object etl {
         otherType match {
           case DataType.Text     => Some(self)
           case DataType.DateTime => Try(java.time.LocalDateTime.parse(value)).toOption.map(DateTime(_))
-          //case DataType.Numeric   => ???
+          // case DataType.Numeric   => ???
         }
     }
 
@@ -260,7 +255,7 @@ object etl {
         otherType match {
           case DataType.Text     => Some(Text(self.toString))
           case DataType.DateTime => Some(self)
-          //case DataType.Numeric   => ???
+          // case DataType.Numeric   => ???
         }
     }
 
@@ -275,16 +270,15 @@ object etl {
     }*/
   }
 
-  /** `Pipeline` is a data type that models a transformation from an input data
-    * set into an output data step, as a series of one or more individual
-    * operations.
+  /** `Pipeline` is a data type that models a transformation from an input data set into an output data step, as a
+    * series of one or more individual operations.
     */
   final case class Pipeline(run: () => DataStream) { self =>
 
     /** EXERCISE 4
       *
-      * Add a `merge` operator that models the merge of the output of this
-      * pipeline with the output of the specified pipeline.
+      * Add a `merge` operator that models the merge of the output of this pipeline with the output of the specified
+      * pipeline.
       *
       * {{{
       * Merge Associativity:  (p1 merge p2) merge p3 == p1 merge (p2 merge p3)
@@ -302,8 +296,8 @@ object etl {
 
     /** EXERCISE 5
       *
-      * Add an `orElse` operator that models applying this pipeline, but if it
-      * fails, switching over and trying another pipeline.
+      * Add an `orElse` operator that models applying this pipeline, but if it fails, switching over and trying another
+      * pipeline.
       */
     def orElse(that: Pipeline): Pipeline =
       Pipeline(() => Try(self.run()).getOrElse(that.run()))
@@ -336,8 +330,8 @@ object etl {
     def replaceNulls(column: String, defaultValue: DataValue): Pipeline =
       Pipeline { () =>
         self.run().mapColumn(column) {
-          //case r@DataValue.Text => ??? // DataValue.Text(r)
-          //case r@DataValue.DateTime => ???
+          // case r@DataValue.Text => ??? // DataValue.Text(r)
+          // case r@DataValue.DateTime => ???
           case _ => defaultValue
         }
       }
@@ -347,18 +341,16 @@ object etl {
 
     /** EXERCISE 10
       *
-      * Add a constructor for `Pipeline` that models extraction of data from
-      * the specified data repository.
+      * Add a constructor for `Pipeline` that models extraction of data from the specified data repository.
       */
     def extract(repo: DataRepo): Pipeline = Pipeline(() => repo.load)
   }
 
   /** EXERCISE 11
     *
-    * Create a pipeline that models extracts data from a URL, replacing all null
-    * "age" columns with "0" as the default age, which renames a column "fname"
-    * into a column "first_name", and which coerces the "age" column into an
-    * integer type.
+    * Create a pipeline that models extracts data from a URL, replacing all null "age" columns with "0" as the default
+    * age, which renames a column "fname" into a column "first_name", and which coerces the "age" column into an integer
+    * type.
     */
   lazy val pipeline: Pipeline =
     Pipeline
@@ -370,11 +362,10 @@ object etl {
 
 /** REAL ESTATE APP - GRADUATION PROJECT
   *
-  * Consider a real estate app that must regularly fetch third-party pricing data
-  * according to specified schedules. These schedules can be quite complicated,
-  * although they possess regular structure (e.g. every fifth Tuesday, and hourly
-  * on Wednesdays). The business considers it acceptable to create the schedules in
-  * code (rather than reading them from a database).
+  * Consider a real estate app that must regularly fetch third-party pricing data according to specified schedules.
+  * These schedules can be quite complicated, although they possess regular structure (e.g. every fifth Tuesday, and
+  * hourly on Wednesdays). The business considers it acceptable to create the schedules in code (rather than reading
+  * them from a database).
   */
 object pricing_fetcher {
   def fetch(directory: java.io.File, url: java.net.URL, schedule: Schedule): Unit = ???
@@ -392,8 +383,8 @@ object pricing_fetcher {
 
   final case class Time(minuteOfHour: Int, hourOfDay: Int, dayOfWeek: DayOfWeek, weekOfMonth: Int, monthOfYear: Int)
 
-  /** `Schedule` is a data type that models a schedule as a simple function,
-    * which specifies whether or not it is time to perform a fetch.
+  /** `Schedule` is a data type that models a schedule as a simple function, which specifies whether or not it is time
+    * to perform a fetch.
     */
   final case class Schedule(fetchNow: Time => Boolean) { self =>
     /*
@@ -410,9 +401,8 @@ object pricing_fetcher {
 
     /** EXERCISE 2
       *
-      * Create an operator for schedule that allows composing two schedules to
-      * yield the intersection of those schedules. That is, the fetch will occur
-      * only when both of the schedules would have performed a fetch.
+      * Create an operator for schedule that allows composing two schedules to yield the intersection of those
+      * schedules. That is, the fetch will occur only when both of the schedules would have performed a fetch.
       */
     def intersection(that: Schedule): Schedule =
       Schedule { time =>
@@ -421,9 +411,8 @@ object pricing_fetcher {
 
     /** EXERCISE 3
       *
-      * Create a unary operator that returns a schedule that will never fetch
-      * when the original schedule would fetch, and will always fetch when the
-      * original schedule would not fetch.
+      * Create a unary operator that returns a schedule that will never fetch when the original schedule would fetch,
+      * and will always fetch when the original schedule would not fetch.
       */
     def negate: Schedule =
       Schedule(time => !self.fetchNow(time))
@@ -434,8 +423,7 @@ object pricing_fetcher {
 
     /** EXERCISE 4
       *
-      * Create a constructor for Schedule that models fetching on specific weeks
-      * of the month.
+      * Create a constructor for Schedule that models fetching on specific weeks of the month.
       */
     def weeks(weeks: Int*): Schedule =
       Schedule { time =>
@@ -444,8 +432,7 @@ object pricing_fetcher {
 
     /** EXERCISE 5
       *
-      * Create a constructor for Schedule that models fetching on specific days
-      * of the week.
+      * Create a constructor for Schedule that models fetching on specific days of the week.
       */
     def daysOfTheWeek(daysOfTheWeek: DayOfWeek*): Schedule =
       Schedule { time =>
@@ -454,8 +441,7 @@ object pricing_fetcher {
 
     /** EXERCISE 6
       *
-      * Create a constructor for Schedule that models fetching on specific
-      * hours of the day.
+      * Create a constructor for Schedule that models fetching on specific hours of the day.
       */
     def hoursOfTheDay(hours: Int*): Schedule =
       Schedule { time =>
@@ -464,8 +450,7 @@ object pricing_fetcher {
 
     /** EXERCISE 7
       *
-      * Create a constructor for Schedule that models fetching on specific minutes
-      * of the hour.
+      * Create a constructor for Schedule that models fetching on specific minutes of the hour.
       */
     def minutesOfTheHour(minutes: Int*): Schedule =
       Schedule { time =>
@@ -475,8 +460,8 @@ object pricing_fetcher {
 
   /** EXERCISE 8
     *
-    * Create a schedule that repeats every Wednesday, at 6:00 AM and 12:00 PM,
-    * and at 5:30, 6:30, and 7:30 every Thursday.
+    * Create a schedule that repeats every Wednesday, at 6:00 AM and 12:00 PM, and at 5:30, 6:30, and 7:30 every
+    * Thursday.
     */
 
   val sixAM12PM = Schedule.hoursOfTheDay(6, 12) intersection Schedule.minutesOfTheHour(0)
@@ -501,8 +486,8 @@ object pricing_fetcher {
         .daysOfTheWeek(DayOfWeek.Thursday)
         .intersection(
           Schedule.hoursOfTheDay(5).intersection(Schedule.minutesOfTheHour(30)) union
-          Schedule.hoursOfTheDay(6).intersection(Schedule.minutesOfTheHour(30)) union
-          Schedule.hoursOfTheDay(7).intersection(Schedule.minutesOfTheHour(30))
+            Schedule.hoursOfTheDay(6).intersection(Schedule.minutesOfTheHour(30)) union
+            Schedule.hoursOfTheDay(7).intersection(Schedule.minutesOfTheHour(30))
         )
     onWednesday union onThursday
   }

@@ -14,8 +14,8 @@ object Starter extends App {
     implicit val StrToDouble = Coercion[String, Double](str => Try(str.toDouble))
   }
 
-  //Declarative encoding
-  //CalculatedValue that works only with doubles
+  // Declarative encoding
+  // CalculatedValue that works only with doubles
   sealed trait CalculatedValue[+A] { self =>
 
     def +(that: CalculatedValue[Double])(implicit ev: A <:< Double): CalculatedValue[Double] =
@@ -63,9 +63,9 @@ object Starter extends App {
 
   import CalculatedValue._
 
-  val strA = "56.02".parse //str("56.01a")
-  val numA = 4.8.n         //v(4.8)
-  val numB = 42.90.n       //v(42.90)
+  val strA = "56.02".parse // str("56.01a")
+  val numA = 4.8.n         // v(4.8)
+  val numB = 42.90.n       // v(42.90)
 
   import Coercion._
   val exp = numA + numB + strA.coerce[Double]
