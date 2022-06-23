@@ -39,3 +39,5 @@ Far more than you've ever wanted to know about ADTs by Nicolas Rinaudo at FP in 
 https://medium.com/bigdatarepublic/writing-functional-dsls-for-business-domains-1bccc5d3f62b
 
 Declarative vs Executable Encodings: https://youtu.be/OD1Yr48-0Js
+
+Data Oriented Programming in Java: https://www.infoq.com/articles/data-oriented-programming-java/
