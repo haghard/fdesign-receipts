@@ -2,7 +2,6 @@ package net.demo
 
 import scala.util.Try
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
 
 /** GADTs - Parametrically polymorphic ADT, where you are allowed to specialize a type parameter in the terms of the sum
   * type.
@@ -19,7 +18,7 @@ import scala.util.{Failure, Success}
         case NumTag.Dbl ⇒ 1.0 //T =:= Double
         case NumTag.Lng ⇒ 1L //T =:= Long
         case NumTag.Flt ⇒ 1.7f //T =:= Float }
-*/
+ */
 
 /*
 

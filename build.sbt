@@ -48,7 +48,7 @@ scalacOptions ++= Seq(
 )
 
 val ZIOVersion = "1.0.13"
-val AmmoniteVersion = "2.5.2"
+val AmmoniteVersion = "2.5.4"
 
 libraryDependencies ++= Seq(
   //for intro only

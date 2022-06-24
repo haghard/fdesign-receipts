@@ -361,10 +361,10 @@ object spreadsheet2 {
       val minCol = range.minCol.getOrElse(0)
       val maxCol = range.maxCol.getOrElse(cols - 1)
 
-      (for {
+      for {
         col <- (minCol to maxCol).toStream
         row <- (minRow to maxRow).toStream
-      } yield Cell(col, row, valueAt(col, row)))
+      } yield Cell(col, row, valueAt(col, row))
     }
   }
 
